@@ -26,6 +26,9 @@ node scripts/audit-site.cjs
 
 在项目根目录执行，脚本会自动上传文件、写 nginx 配置、检查语法、重载、并做部署后自检：
 
+> 前置：先跑一次 `npm install` —— 部署脚本用到的 `ssh2` 放在 devDependencies 里（不随打包产物发布）。
+> 注意不要用 `npm install <包> --no-save` 临时装包：它会顺手把 `ssh2` 这类未声明的包清掉，导致脚本报 `Cannot find module 'ssh2'`。
+
 ```powershell
 cd E:\Code\harness\safevault
 $env:SAFEVAULT_SSH_HOST='你的服务器公网IP'      # 必填

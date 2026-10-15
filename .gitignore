@@ -39,5 +39,9 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
-# ��Ŀ¼��� zip �Ǵ���չ�õ���ʱ����
+# 根目录下的 zip 是打包浏览器扩展用的临时产物
 chrome-extension.zip
+
+# ===== 自检脚本用的临时 Electron 数据目录 =====
+.site-check-userdata/
+.cover-userdata/
