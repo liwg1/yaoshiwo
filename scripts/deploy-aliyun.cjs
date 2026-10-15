@@ -1,0 +1,332 @@
+// 把 website/ 部署到阿里云服务器（Nginx 静态站）。
+//
+// 用法（密码只从环境变量读，绝不写进代码，方便开源）：
+//   $env:SAFEVAULT_SSH_PASS='服务器root密码'
+//   node scripts/deploy-aliyun.cjs recon     # 只看不动：系统版本、nginx 是否已装、磁盘、已有站点
+//   node scripts/deploy-aliyun.cjs deploy    # 真正部署：上传文件 + 写 nginx 配置 + 重载
+//   node scripts/deploy-aliyun.cjs status    # 部署后检查：nginx -t、站点响应、证书
+//
+// 可用环境变量覆盖默认值：
+//   SAFEVAULT_SSH_HOST（必填：服务器公网 IP 或域名）、SAFEVAULT_SSH_USER（默认 root）
+//   SAFEVAULT_SSH_PORT（默认 22）、SAFEVAULT_DOMAIN（默认 yaoshiwo.cn）
+//   SAFEVAULT_WEB_ROOT（默认 /var/www/yaoshiwo）
+const { Client } = require('ssh2')
+const fs = require('node:fs')
+const path = require('node:path')
+
+const ROOT = path.join(__dirname, '..')
+const LOCAL_SITE = path.join(ROOT, 'website')
+// 服务器地址只从环境变量读，不写死在代码里（这是要开源的仓库，别把你服务器的 IP 和密码写进去）
+const HOST = process.env.SAFEVAULT_SSH_HOST || ''
+const USER = process.env.SAFEVAULT_SSH_USER || 'root'
+const PORT = Number(process.env.SAFEVAULT_SSH_PORT || 22)
+const DOMAIN = process.env.SAFEVAULT_DOMAIN || 'yaoshiwo.cn'
+const WEB_ROOT = process.env.SAFEVAULT_WEB_ROOT || '/var/www/yaoshiwo'
+const PASS = process.env.SAFEVAULT_SSH_PASS
+const mode = (process.argv[2] || 'recon').toLowerCase()
+
+// 不上传的东西：本地预览截图（体积大且没必要上服务器）
+const SKIP_DIRS = new Set(['preview'])
+const SKIP_FILES = new Set(['.gitignore'])
+
+if (!PASS) {
+  console.error('缺少环境变量 SAFEVAULT_SSH_PASS（服务器 root 密码）。')
+  process.exit(2)
+}
+if (!HOST) {
+  console.error('缺少环境变量 SAFEVAULT_SSH_HOST（服务器公网 IP 或域名）。')
+  process.exit(2)
+}
+
+function connect() {
+  return new Promise((resolve, reject) => {
+    const conn = new Client()
+    conn.on('ready', () => resolve(conn))
+    conn.on('error', (e) => reject(e))
+    conn.connect({
+      host: HOST,
+      port: PORT,
+      username: USER,
+      password: PASS,
+      readyTimeout: 25000,
+      keepaliveInterval: 10000
+    })
+  })
+}
+
+function sh(conn, cmd, { timeout = 120000, label } = {}) {
+  return new Promise((resolve, reject) => {
+    conn.exec(cmd, { pty: false }, (err, stream) => {
+      if (err) return reject(err)
+      let out = ''
+      let errOut = ''
+      const timer = setTimeout(() => {
+        stream.close()
+        reject(new Error('命令超时: ' + cmd))
+      }, timeout)
+      stream.on('data', (d) => (out += d.toString()))
+      stream.stderr.on('data', (d) => (errOut += d.toString()))
+      stream.on('close', (code) => {
+        clearTimeout(timer)
+        if (label) console.log(`  $ ${label} → exit ${code}`)
+        resolve({ code, out, err: errOut })
+      })
+    })
+  })
+}
+
+function sftpOf(conn) {
+  return new Promise((resolve, reject) => {
+    conn.sftp((err, sftp) => (err ? reject(err) : resolve(sftp)))
+  })
+}
+
+function walk(dir, base = dir, acc = []) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, e.name)
+    const rel = path.relative(base, full).split(path.sep).join('/')
+    if (e.isDirectory()) {
+      if (SKIP_DIRS.has(e.name)) continue
+      walk(full, base, acc)
+    } else if (!SKIP_FILES.has(e.name)) {
+      acc.push({ rel, full, size: fs.statSync(full).size })
+    }
+  }
+  return acc
+}
+
+function mkdirp(sftp, dir) {
+  return new Promise((resolve) => sftp.mkdir(dir, { mode: 0o755 }, () => resolve()))
+}
+
+function put(sftp, local, remote) {
+  return new Promise((resolve, reject) => {
+    sftp.fastPut(local, remote, (err) => (err ? reject(err) : resolve()))
+  })
+}
+
+async function uploadDir(conn, localDir, remoteDir) {
+  const sftp = await sftpOf(conn)
+  const files = walk(localDir)
+  const dirs = new Set()
+  for (const f of files) {
+    const parts = f.rel.split('/')
+    parts.pop()
+    let acc = ''
+    for (const p of parts) {
+      acc = acc ? `${acc}/${p}` : p
+      dirs.add(acc)
+    }
+  }
+  await mkdirp(sftp, remoteDir)
+  for (const d of [...dirs].sort()) await mkdirp(sftp, `${remoteDir}/${d}`)
+
+  let done = 0
+  let bytes = 0
+  for (const f of files) {
+    await put(sftp, f.full, `${remoteDir}/${f.rel}`)
+    done++
+    bytes += f.size
+    if (done % 20 === 0 || f.size > 5 * 1024 * 1024) {
+      console.log(`  已上传 ${done}/${files.length}（${(bytes / 1048576).toFixed(1)} MB）→ ${f.rel}`)
+    }
+  }
+  sftp.end()
+  console.log(`  上传完成：${done} 个文件，共 ${(bytes / 1048576).toFixed(1)} MB`)
+  return { files: done, bytes }
+}
+
+const NGINX_CONF = `# 钥匙窝 YaoShiWo 官网 —— 由 scripts/deploy-aliyun.cjs 生成
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN} www.${DOMAIN};
+
+    root ${WEB_ROOT};
+    index index.html;
+
+    charset utf-8;
+    access_log /var/log/nginx/${DOMAIN}.access.log;
+    error_log  /var/log/nginx/${DOMAIN}.error.log;
+
+    # 安全响应头（meta 里放 frame-ancestors 无效，只能在这里给）
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" always;
+
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
+    # 静态资源长缓存
+    location /assets/ {
+        expires 30d;
+        add_header Cache-Control "public";
+        try_files $uri =404;
+    }
+
+    # 安装包 / 扩展压缩包：必须走下载而不是在浏览器里打开
+    location /download/ {
+        types { }
+        default_type application/octet-stream;
+        add_header Content-Disposition "attachment";
+        try_files $uri =404;
+    }
+
+    # 网站地图与爬虫文件
+    location = /sitemap.xml { default_type application/xml; charset utf-8; }
+    location = /robots.txt  { default_type text/plain; charset utf-8; }
+
+    gzip on;
+    gzip_comp_level 5;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/javascript application/json application/xml image/svg+xml;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+`
+
+async function recon(conn) {
+  console.log('===== 服务器侦察（不做任何修改）=====')
+  const cmds = [
+    ['系统版本', 'cat /etc/os-release 2>/dev/null | head -3'],
+    ['内核/架构', 'uname -m && uname -r'],
+    ['CPU/内存', 'nproc && free -m | head -2'],
+    ['磁盘', 'df -h / | tail -1'],
+    ['nginx 是否已装', 'nginx -v 2>&1 || echo "未安装 nginx"'],
+    ['nginx 版本详情', '(nginx -V 2>&1 | tr " " "\\n" | grep -E "with-http_ssl|with-http_v2" ) || true'],
+    ['nginx 运行状态', 'systemctl is-active nginx 2>/dev/null || echo "未运行"'],
+    ['已启用的站点', 'ls -1 /etc/nginx/conf.d/ 2>/dev/null; ls -1 /etc/nginx/sites-enabled/ 2>/dev/null'],
+    ['现有网站目录', 'ls -1 /var/www/ 2>/dev/null || echo "(无 /var/www)"'],
+    ['80/443 端口占用', 'ss -lntp 2>/dev/null | grep -E ":80|:443" || echo "80/443 未被占用"'],
+    ['已有证书', 'ls -1 /etc/letsencrypt/live/ 2>/dev/null || echo "(无 certbot 证书)"'],
+    ['certbot 是否已装', 'which certbot || echo "未安装 certbot"'],
+    ['DNS 解析（服务器自己看）', `getent hosts ${DOMAIN} || echo "服务器上解析不到 ${DOMAIN}（正常，等 DNS 生效）"`],
+    ['宝塔面板', 'ls -d /www/server/panel 2>/dev/null || echo "无宝塔"'],
+    ['nginx 进程', 'ps -eo pid,ppid,user,etime,args | grep -E "[n]ginx" | head -8'],
+    ['nginx 由谁管理', 'systemctl list-units --all 2>/dev/null | grep -i nginx || echo "systemd 里没有 nginx 单元"'],
+    ['nginx 主配置里的 include', 'grep -E "^\\s*include" /etc/nginx/nginx.conf'],
+    ['现有站点配置内容', 'for f in /etc/nginx/conf.d/*.conf /etc/nginx/sites-enabled/*; do [ -f "$f" ] && echo "===== $f =====" && cat "$f"; done 2>/dev/null | head -80'],
+    ['现有网站文件', 'ls -la /var/www/ 2>/dev/null; echo "--- html ---"; ls -la /var/www/html 2>/dev/null | head -10; echo "--- portal ---"; ls -la /var/www/portal 2>/dev/null | head -10'],
+    ['80 端口实际响应', 'curl -s -o /dev/null -w "本机直接访问 80 → HTTP %{http_code}｜server=%{header_json}" http://127.0.0.1/ 2>/dev/null | head -c 200 || echo 失败'],
+    ['当前时间与时区', 'date && timedatectl 2>/dev/null | head -3'],
+    ['是否在容器里', 'systemd-detect-virt 2>/dev/null || echo unknown']
+  ]
+  for (const [label, cmd] of cmds) {
+    const r = await sh(conn, cmd)
+    const text = (r.out || r.err || '').trim()
+    console.log(`\n— ${label} —\n${text || '(空)'}`)
+  }
+}
+
+async function deploy(conn) {
+  console.log('===== 部署开始 =====')
+  const os = (await sh(conn, 'cat /etc/os-release | head -2')).out
+  console.log('目标服务器：' + os.trim().replace(/\n/g, ' | '))
+
+  const hasNginx = (await sh(conn, 'command -v nginx || true')).out.trim()
+  if (!hasNginx) {
+    console.log('服务器没有 nginx，开始安装…')
+    const inst = await sh(
+      conn,
+      'export DEBIAN_FRONTEND=noninteractive; (apt-get update -y && apt-get install -y nginx) || (yum install -y nginx)',
+      { timeout: 600000 }
+    )
+    console.log(inst.out.split('\n').slice(-6).join('\n'))
+    const again = (await sh(conn, 'command -v nginx || true')).out.trim()
+    if (!again) throw new Error('nginx 安装失败，请手动安装后再部署')
+  } else {
+    console.log('nginx 已安装：' + (await sh(conn, 'nginx -v 2>&1')).out.trim())
+  }
+
+  console.log('\n创建网站目录 ' + WEB_ROOT)
+  await sh(conn, `mkdir -p ${WEB_ROOT}`)
+
+  console.log('\n上传网站文件…')
+  const { files, bytes } = await uploadDir(conn, LOCAL_SITE, WEB_ROOT)
+  console.log(`  共 ${files} 个文件 / ${(bytes / 1048576).toFixed(1)} MB`)
+
+  console.log('\n写入 nginx 配置 /etc/nginx/conf.d/' + DOMAIN + '.conf')
+  const sftp = await sftpOf(conn)
+  const tmp = `/tmp/${DOMAIN}.conf`
+  await new Promise((resolve, reject) =>
+    sftp.writeFile(tmp, NGINX_CONF, 'utf8', (e) => (e ? reject(e) : resolve()))
+  )
+  sftp.end()
+  await sh(conn, `mv ${tmp} /etc/nginx/conf.d/${DOMAIN}.conf && chmod 644 /etc/nginx/conf.d/${DOMAIN}.conf`)
+  // 刻意不动服务器上已有的站点配置（这台机器上原本就有 portal.conf，删了会搞坏别人的站点）：
+  // 我们的 server_name 只认 yaoshiwo.cn，不会和其它站点抢域名。
+
+  const test = await sh(conn, 'nginx -t 2>&1')
+  console.log(test.out.trim())
+  if (test.code !== 0) throw new Error('nginx 配置检查未通过，已放弃重载（配置留在 /etc/nginx/conf.d/' + DOMAIN + '.conf）')
+
+  // 这台服务器上的 nginx 不是 systemd 管的（systemctl is-active 显示未运行，但进程确实在监听 80），
+  // 所以优先用 nginx 自己的信号重载，失败再退回 systemctl。
+  const reload = await sh(conn, 'nginx -s reload 2>&1 || systemctl reload nginx 2>&1 || systemctl restart nginx 2>&1')
+  console.log('重载结果：' + (reload.out.trim() || 'ok'))
+
+  await sh(conn, `chown -R www-data:www-data ${WEB_ROOT} 2>/dev/null || chown -R nginx:nginx ${WEB_ROOT} 2>/dev/null; chmod -R a+rX ${WEB_ROOT}`)
+  console.log('目录权限已设置')
+
+  console.log('\n—— 部署后自检 ——')
+  for (const [label, cmd] of [
+    ['nginx 状态', 'systemctl is-active nginx'],
+    ['本机访问首页', 'curl -s -o /dev/null -w "%{http_code}" -H "Host: ' + DOMAIN + '" http://127.0.0.1/'],
+    ['本机访问安装包', 'curl -s -o /dev/null -w "%{http_code} %{content_type} %{size_download}" -H "Host: ' + DOMAIN + '" http://127.0.0.1/download/YaoShiWo-Setup-1.2.0.exe'],
+    ['本机访问 sitemap', 'curl -s -o /dev/null -w "%{http_code} %{content_type}" -H "Host: ' + DOMAIN + '" http://127.0.0.1/sitemap.xml'],
+    ['站点文件数', `find ${WEB_ROOT} -type f | wc -l`],
+    ['占用空间', `du -sh ${WEB_ROOT}`],
+    ['防火墙', '(ufw status 2>/dev/null | head -1) || (firewall-cmd --state 2>/dev/null) || echo "无 ufw/firewalld"']
+  ]) {
+    const r = await sh(conn, cmd)
+    console.log(`  ${label}：${(r.out || r.err).trim()}`)
+  }
+  console.log('\n===== 部署完成 =====')
+  console.log('下一步（需要你在阿里云控制台做）：')
+  console.log('  1. 安全组放行 80/443（入方向，来源 0.0.0.0/0）')
+  console.log('  2. 域名 DNS 添加 A 记录：' + DOMAIN + ' → ' + HOST)
+  console.log('  3. 域名备案通过后（未备案时 80 端口会被阿里云拦截）再跑：node scripts/deploy-aliyun.cjs https')
+}
+
+async function status(conn) {
+  console.log('===== 线上状态检查 =====')
+  for (const [label, cmd] of [
+    ['nginx 配置', 'nginx -t 2>&1'],
+    ['nginx 状态', 'systemctl is-active nginx'],
+    ['监听端口', 'ss -lntp | grep -E ":80|:443" || echo "无"'],
+    ['站点文件数/大小', `du -sh ${WEB_ROOT} 2>/dev/null; find ${WEB_ROOT} -type f 2>/dev/null | wc -l`],
+    ['首页', `curl -s -o /dev/null -w "HTTP %{http_code}｜%{size_download} 字节｜%{time_total}s" -H "Host: ${DOMAIN}" http://127.0.0.1/`],
+    ['CSS', `curl -s -o /dev/null -w "HTTP %{http_code}｜%{content_type}" -H "Host: ${DOMAIN}" http://127.0.0.1/assets/css/style.css`],
+    ['robots', `curl -s -o /dev/null -w "HTTP %{http_code}｜%{content_type}" -H "Host: ${DOMAIN}" http://127.0.0.1/robots.txt`],
+    ['证书', `ls -1 /etc/letsencrypt/live/ 2>/dev/null || echo "还没有证书"`],
+    ['公网访问（从服务器出去绕回）', `curl -s -o /dev/null -w "HTTP %{http_code}" --max-time 8 http://${DOMAIN}/ || echo "解析或备案未就绪"`]
+  ]) {
+    const r = await sh(conn, cmd)
+    console.log(`  ${label}：${(r.out || r.err).trim()}`)
+  }
+}
+
+;(async () => {
+  let conn
+  try {
+    console.log(`连接 ${USER}@${HOST}:${PORT} …`)
+    conn = await connect()
+    console.log('已登录服务器\n')
+    if (mode === 'recon') await recon(conn)
+    else if (mode === 'deploy') await deploy(conn)
+    else if (mode === 'status') await status(conn)
+    else {
+      console.error('未知模式：' + mode + '（可用：recon / deploy / status）')
+      process.exitCode = 2
+    }
+  } catch (e) {
+    console.error('\n!! 失败：' + e.message)
+    process.exitCode = 1
+  } finally {
+    if (conn) conn.end()
+  }
+})()

@@ -1,0 +1,43 @@
+# ===== 依赖与构建产物 =====
+node_modules/
+out/
+dist/
+release/
+*.log
+
+# ===== 本机缓存（有人按 README 里的镜像配置会在项目里生成这些目录）=====
+.npm-cache/
+.electron-cache/
+.electron-builder-cache/
+.tools/
+.tmp-*/
+
+# ===== 绝不入库：用户自己的密码库与备份 =====
+# 密码库文件是你的命根子，任何情况下都不要提交到仓库
+.backup/
+*.kdbx
+*.kdbx.bak-*
+*.diag-xml.xml
+.tmp-*.xml
+
+# ===== 本地私密配置 / 令牌 =====
+# 浏览器扩展令牌（运行时生成在 %APPDATA%\safevault\extension.json，别复制进项目）
+extension.json
+.env
+.env.local
+.deploy-secrets.json
+
+# ===== 官网的本地预览与安装包（安装包 80MB，走 GitHub Releases 或服务器，不进仓库）=====
+website/preview/
+website/download/*.exe
+website/download/*.zip
+
+# ===== 编辑器 / 系统垃圾 =====
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ��Ŀ¼��� zip �Ǵ���չ�õ���ʱ����
+chrome-extension.zip

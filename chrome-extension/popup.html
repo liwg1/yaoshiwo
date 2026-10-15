@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        width: 320px;
+        margin: 0;
+        font-family: 'Segoe UI', 'Microsoft YaHei', system-ui, sans-serif;
+        font-size: 13px;
+        background: #ffffff;
+        color: #0f172a;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #0f172a;
+          color: #e2e8f0;
+        }
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      }
+      header strong {
+        font-size: 13px;
+      }
+      .status {
+        margin-left: auto;
+        font-size: 11px;
+        color: #64748b;
+      }
+      main {
+        padding: 8px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .hint {
+        margin: 8px 4px;
+        font-size: 12px;
+        color: #64748b;
+        line-height: 1.7;
+      }
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 8px;
+      }
+      .item:hover {
+        background: rgba(59, 130, 246, 0.08);
+      }
+      .info {
+        flex: 1;
+        min-width: 0;
+      }
+      .title {
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .user {
+        font-size: 11px;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      button {
+        border: none;
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 12px;
+        background: #2563eb;
+        color: #fff;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      button:hover {
+        background: #1d4fd8;
+      }
+      #setup {
+        padding: 10px 12px;
+        border-top: 1px solid rgba(148, 163, 184, 0.25);
+        display: grid;
+        gap: 8px;
+      }
+      #setup[hidden] {
+        display: none;
+      }
+      #setup label {
+        font-size: 11px;
+        color: #64748b;
+      }
+      #setup input[type='password'],
+      #setup input[type='text'],
+      #setup input[type='number'] {
+        width: 100%;
+        margin-top: 3px;
+        padding: 6px 8px;
+        border-radius: 6px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: transparent;
+        color: inherit;
+        font-size: 12px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="icons/icon48.png" width="18" height="18" alt="" />
+      <strong>钥匙窝</strong>
+      <span class="status" id="status">…</span>
+    </header>
+    <main id="content"></main>
+    <section id="setup">
+      <div>
+        <label for="token">访问令牌</label>
+        <input id="token" type="password" placeholder="粘贴 钥匙窝 设置中的令牌" />
+      </div>
+      <div>
+        <label for="port">端口</label>
+        <input id="port" type="number" value="38471" />
+      </div>
+      <label class="row"><input id="autoFill" type="checkbox" checked /> 在匹配网站自动填充</label>
+      <label class="row"
+        ><input id="offerSave" type="checkbox" checked /> 注册/登录时提示保存新密码</label
+      >
+      <button id="save">保存设置</button>
+    </section>
+    <script src="popup.js"></script>
+  </body>
+</html>

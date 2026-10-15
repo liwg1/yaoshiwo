@@ -1,0 +1,96 @@
+{
+  "name": "safevault",
+  "version": "1.2.0",
+  "description": "钥匙窝（YaoShiWo）：安全、现代、本地的密码管理器",
+  "main": "./out/main/index.js",
+  "author": "钥匙窝 YaoShiWo",
+  "license": "MIT",
+  "homepage": "https://yaoshiwo.cn",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liwg1/yaoshiwo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/liwg1/yaoshiwo/issues"
+  },
+  "keywords": [
+    "password-manager",
+    "keepass",
+    "kdbx",
+    "electron",
+    "react",
+    "windows",
+    "offline",
+    "密码管理器",
+    "钥匙窝"
+  ],
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "package:win": "electron-vite build && electron-builder --win --x64",
+    "package:dir": "electron-vite build && electron-builder --dir"
+  },
+  "dependencies": {
+    "hash-wasm": "^4.11.0",
+    "kdbxweb": "^2.1.0",
+    "lucide-react": "^0.462.0",
+    "pinyin-pro": "^3.29.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  },
+  "build": {
+    "appId": "com.safevault.app",
+    "productName": "钥匙窝",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "钥匙窝",
+      "artifactName": "YaoShiWo-Setup-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "YaoShiWo-portable.exe"
+    }
+  }
+}

@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>钥匙窝 YaoShiWo｜本地加密、不上传云端的 Windows 密码管理软件</title>
+<meta name="description" content="钥匙窝（YaoShiWo）是一款免费的 Windows 密码管理器：AES-256 整库加密、Argon2 密钥派生、KeePass 标准 KDBX 4 格式，支持浏览器自动填充、拼音模糊搜索、动态口令（TOTP）。密码只存在你自己电脑上，不上传云端、不用注册、断网可用。" />
+<meta name="keywords" content="密码管理器,密码管理软件,Windows密码管理器,免费密码管理器,本地密码管理器,密码本,KeePass,KDBX,浏览器自动填充,动态口令,TOTP,AES-256,Argon2,钥匙窝,YaoShiWo" />
+<meta name="author" content="钥匙窝 YaoShiWo" />
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
+<meta name="theme-color" content="#070d1a" />
+<!-- 站点域名：yaoshiwo.cn（canonical / og:url / 结构化数据 / sitemap 都指向它；换域名时记得全站一起改） -->
+<link rel="canonical" href="https://yaoshiwo.cn/" />
+
+<!-- 搜索引擎验证（在各自站长平台拿到验证码后，把对应那行的注释去掉并填进去）：
+     百度搜索资源平台： <meta name="baidu-site-verification" content="codeva-xxxxxxxxxx" />
+     必应站长工具：     <meta name="msvalidate.01" content="xxxxxxxxxxxxxxxx" />
+     Google Search Console： <meta name="google-site-verification" content="xxxxxxxxxxxxxxxx" />
+     也可以用「HTML 文件验证」，把平台给的 xxx.html 直接放进 website/ 根目录即可。 -->
+
+<!-- 分享卡片（微信 / QQ / GitHub / Bing / Google 都读这些） -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="钥匙窝 YaoShiWo" />
+<meta property="og:locale" content="zh_CN" />
+<meta property="og:title" content="钥匙窝 YaoShiWo｜本地加密、不上传云端的 Windows 密码管理软件" />
+<meta property="og:description" content="免费的本地密码管理器：AES-256 加密 + Argon2 派生 + KeePass KDBX 4 格式，支持浏览器自动填充与动态口令。数据只在你自己的电脑上，不上传云端。" />
+<meta property="og:url" content="https://yaoshiwo.cn/" />
+<meta property="og:image" content="https://yaoshiwo.cn/assets/img/og-cover.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="钥匙窝 YaoShiWo：你的密码，只属于你自己" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="钥匙窝 YaoShiWo｜本地加密、不上传云端" />
+<meta name="twitter:description" content="免费的 Windows 本地密码管理器，KeePass KDBX 4 兼容，支持浏览器自动填充与动态口令。" />
+<meta name="twitter:image" content="https://yaoshiwo.cn/assets/img/og-cover.png" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'" />
+<link rel="icon" href="assets/img/logo.svg" />
+<link rel="stylesheet" href="assets/css/style.css" />
+<noscript><style>.reveal{opacity:1 !important;transform:none !important}</style></noscript>
+
+<!-- 结构化数据：让搜索引擎知道这是一款什么软件 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "钥匙窝 YaoShiWo",
+  "alternateName": ["YaoShiWo", "钥匙窝 密码管理器", "钥匙窝密码管理软件"],
+  "applicationCategory": "SecurityApplication",
+  "applicationSubCategory": "密码管理器",
+  "operatingSystem": "Windows 10, Windows 11 (64 位)",
+  "softwareVersion": "1.2.0",
+  "fileSize": "80MB",
+  "inLanguage": "zh-CN",
+  "isAccessibleForFree": true,
+  "description": "钥匙窝是一款把数据完全存放在本机的 Windows 密码管理器：AES-256 整库加密、Argon2 密钥派生、KeePass 标准 KDBX 4 格式，支持浏览器自动填充、拼音模糊搜索与动态口令。不上传云端、不需要注册、断网可用。",
+  "url": "https://yaoshiwo.cn/",
+  "downloadUrl": "https://yaoshiwo.cn/download/YaoShiWo-Setup-1.2.0.exe",
+  "installUrl": "https://yaoshiwo.cn/download/YaoShiWo-Setup-1.2.0.exe",
+  "softwareHelp": "https://yaoshiwo.cn/#faq",
+  "image": "https://yaoshiwo.cn/assets/img/og-cover.png",
+  "screenshot": "https://yaoshiwo.cn/assets/img/og-cover.png",
+  "featureList": [
+    "数据只存在本机，不上传云端",
+    "AES-256 整库加密 + Argon2 密钥派生",
+    "KeePass 2 标准 KDBX 4 格式双向兼容",
+    "Chrome / Edge 浏览器自动填充（本地回环通信）",
+    "拼音模糊搜索（全拼与首字母）",
+    "动态口令 TOTP 内置",
+    "密码更新历史与重复记录一键清理",
+    "明暗主题与字体缩放"
+  ],
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "钥匙窝",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://yaoshiwo.cn/assets/img/logo.svg"
+    }
+  }
+}
+</script>
+
+<!-- 结构化数据：常见问题（有机会在搜索结果里直接展开问答） -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "我的数据会被上传到你们服务器吗？",
+      "acceptedAnswer": { "@type": "Answer", "text": "不会。钥匙窝没有账号系统，也没有任何上传通道，程序的网络行为只包括本地回环通信（浏览器扩展）和你主动触发的网站图标抓取。你可以断网试用，功能一个都不会少。" }
+    },
+    {
+      "@type": "Question",
+      "name": "忘记主密码怎么办？",
+      "acceptedAnswer": { "@type": "Answer", "text": "没有后门，谁也恢复不了——这正是本地加密该有的样子。请务必把主密码记牢，并保留一份数据库文件备份，把主密码保存在你能长期掌控的地方。" }
+    },
+    {
+      "@type": "Question",
+      "name": "能和 KeePass 互相打开吗？",
+      "acceptedAnswer": { "@type": "Answer", "text": "可以。钥匙窝读写的是 KeePass 2 的标准 KDBX 4 格式，两边都能打开同一份文件并正确保存，迁移与回退都没有障碍。" }
+    },
+    {
+      "@type": "Question",
+      "name": "支持多设备同步吗？",
+      "acceptedAnswer": { "@type": "Answer", "text": "同步交给你自己：可以用 U 盘、你自己的网盘目录或私有服务器来存放那个 .kdbx 文件。钥匙窝只负责把文件写对、写好，不参与你的数据流转。" }
+    },
+    {
+      "@type": "Question",
+      "name": "支持哪些系统？",
+      "acceptedAnswer": { "@type": "Answer", "text": "当前版本面向 Windows 10 / 11 的 64 位系统，提供安装版与免安装版两种形态。浏览器扩展适用于 Chrome 及基于 Chromium 的浏览器（含 Edge）。" }
+    },
+    {
+      "@type": "Question",
+      "name": "装完之后怎么开始？",
+      "acceptedAnswer": { "@type": "Answer", "text": "三步：下载安装 → 选择已有数据库或新建一个（新建需设置主密码）→ 在设置里开启浏览器扩展并按提示加载扩展。数据库文件默认就是普通文件，你想放哪就放哪。" }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<!-- ============ 顶部导航 ============ -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#top">
+      <span class="nav-logo">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2.2l7.2 3.4v5.9c0 4.6-3.1 8.7-7.2 10.9-4.1-2.2-7.2-6.3-7.2-10.9V5.6L12 2.2z" fill="currentColor"/>
+          <path d="M8.6 12.1l2.3 2.3 4.5-4.6" stroke="#0b1220" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="nav-name">钥匙窝<span class="nav-sub">密码管理器</span></span>
+      <span class="nav-ver">v1.2.0</span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#features">功能</a>
+      <a href="#security">安全</a>
+      <a href="#extension">浏览器扩展</a>
+      <a href="#compare">为什么本地</a>
+      <a href="#faq">常见问题</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-primary btn-sm" href="#download">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        下载
+      </a>
+      <button class="nav-burger" id="navBurger" aria-label="打开菜单" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============ 首屏 ============ -->
+<section class="hero">
+  <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="orb orb-a" aria-hidden="true"></div>
+  <div class="orb orb-b" aria-hidden="true"></div>
+
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <div class="badge reveal">
+        <span class="badge-dot"></span>
+        v1.2.0 已发布 · 正式定名「钥匙窝」，日常更顺手
+      </div>
+      <h1 class="reveal">
+        你的密码，<br />
+        <span class="grad">只属于你自己</span>
+      </h1>
+      <p class="hero-sub reveal">
+        钥匙窝是一款把数据<strong>完全存放在你自己电脑上</strong>的 Windows 密码管理器。
+        AES-256 加密、Argon2 密钥派生、KeePass 标准 KDBX 格式——不上传、不需要注册、断网可用。
+        连我们也没有你的主密码，因为这个世界上只有你手上有那把钥匙。
+      </p>
+      <div class="hero-cta reveal">
+        <a class="btn btn-primary btn-lg" href="#download">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          下载 Windows 版
+        </a>
+        <a class="btn btn-ghost btn-lg" href="#features">看看它有什么</a>
+      </div>
+      <ul class="hero-meta reveal">
+        <li>安装包约 80 MB</li>
+        <li>Windows 10 / 11 · 64 位</li>
+        <li>另有免安装版</li>
+      </ul>
+    </div>
+
+    <!-- 应用界面示意 -->
+    <div class="hero-visual reveal">
+      <div class="app-window">
+        <div class="aw-titlebar">
+          <span class="aw-dot r"></span><span class="aw-dot y"></span><span class="aw-dot g"></span>
+          <span class="aw-title">钥匙窝 — 数据库.kdbx</span>
+          <span class="aw-tools"><i></i><i></i></span>
+        </div>
+        <div class="aw-body">
+          <aside class="aw-side">
+            <div class="aw-search">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <span>zhifubao</span>
+            </div>
+            <div class="aw-group g1"><b>常用</b><em>12</em></div>
+            <div class="aw-group g2"><b>金融支付</b><em>23</em></div>
+            <div class="aw-group g3"><b>邮箱办公</b><em>18</em></div>
+            <div class="aw-group g4"><b>社交娱乐</b><em>31</em></div>
+            <div class="aw-group g5"><b>服务器</b><em>9</em></div>
+          </aside>
+          <div class="aw-list">
+            <div class="aw-item active">
+              <span class="aw-avatar" style="--c1:#1677ff;--c2:#0958d9">支</span>
+              <span class="aw-text"><b>支付宝</b><i>zhifubao.com</i></span>
+            </div>
+            <div class="aw-item">
+              <span class="aw-avatar" style="--c1:#f97316;--c2:#ea580c">淘</span>
+              <span class="aw-text"><b>淘宝</b><i>taobao.com</i></span>
+            </div>
+            <div class="aw-item">
+              <span class="aw-avatar" style="--c1:#22c55e;--c2:#15803d">微</span>
+              <span class="aw-text"><b>微信</b><i>weixin.qq.com</i></span>
+            </div>
+            <div class="aw-item">
+              <span class="aw-avatar" style="--c1:#6366f1;--c2:#4338ca">G</span>
+              <span class="aw-text"><b>GitHub</b><i>github.com</i></span>
+            </div>
+            <div class="aw-item">
+              <span class="aw-avatar" style="--c1:#0ea5e9;--c2:#0369a1">网</span>
+              <span class="aw-text"><b>网易邮箱</b><i>mail.163.com</i></span>
+            </div>
+          </div>
+          <div class="aw-detail">
+            <div class="aw-detail-head">
+              <span class="aw-avatar lg" style="--c1:#1677ff;--c2:#0958d9">支</span>
+              <div><b>支付宝</b><i>zhifubao.com</i></div>
+            </div>
+            <div class="aw-field"><label>用户名</label><span>my-account@example.com</span></div>
+            <div class="aw-field"><label>密码</label><span class="dots">••••••••••••</span><em class="aw-eye"></em></div>
+            <div class="aw-field"><label>动态口令</label><span class="totp">732 914 <i>18s</i></span></div>
+            <div class="aw-field"><label>备注</label><span class="muted">绑定手机已更换为备用号</span></div>
+            <div class="aw-history">
+              <b>密码更新历史</b>
+              <span>2026-10-14 · 3 次密码更新</span>
+              <span>重复记录一键清理</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="float-card fc-1">
+        <span class="fc-ico green"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span><b>已自动填充</b><i>taobao.com</i></span>
+      </div>
+      <div class="float-card fc-2">
+        <span class="fc-ico cyan"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4.4-3 8.2-7 10-4-1.8-7-5.6-7-10V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+        <span><b>AES-256</b><i>本地加密</i></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <ul class="stats reveal" id="stats">
+      <li><b data-count="0" data-suffix="">0</b><span>云端上传</span></li>
+      <li><b>AES-256</b><span>数据库加密</span></li>
+      <li><b>Argon2</b><span>密钥派生</span></li>
+      <li><b>KDBX 4</b><span>兼容 KeePass</span></li>
+      <li><b data-count="539" data-suffix="+">0</b><span>条记录依旧轻快</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 功能 ============ -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">FEATURES</span>
+      <h2>该有的都有，<span class="grad">不该有的都没有</span></h2>
+      <p>没有账号体系、没有会员等级、没有云端同步开关。打开就是一个密码本，关掉就彻底安静。</p>
+    </div>
+
+    <div class="cards">
+      <article class="card reveal">
+        <span class="card-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7l8-4 8 4v10l-8 4-8-4V7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 3v18M4 7l8 4 8-4" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+        <h3>数据只在你本机</h3>
+        <p>整个密码库就是一个 <code>.kdbx</code> 文件，放在你自己的硬盘上。放在哪、要不要备份、要不要拷进 U 盘，全由你决定。</p>
+      </article>
+
+      <article class="card reveal">
+        <span class="card-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M8 4h8l4 4v12H4V4h4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        <h3>KeePass 双向兼容</h3>
+        <p>采用 KeePass 2 的标准 KDBX 4 格式，两边可以互相打开、互相保存。哪天你不想用它了，数据依然完整可用。</p>
+      </article>
+
+      <article class="card reveal">
+        <span class="card-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.7"/><path d="M7 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        <h3>浏览器自动填充</h3>
+        <p>配套 Chrome 扩展识别登录框，点一下就填上；遇到新账号会主动问你要不要存。整个过程只在 <code>127.0.0.1</code> 上通信。</p>
+      </article>
+
+      <article class="card reveal">
+        <span class="card-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M9 20h6M12 16v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        <h3>托盘常驻待命</h3>
+        <p>点关闭只是收进状态栏，进程继续待命，浏览器随时能取到密码。想彻底退出？设置里一句话的事，也可以每次询问你。</p>
+      </article>
+
+      <article class="card reveal">
+        <span class="card-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.7"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        <h3>拼音模糊搜索</h3>
+        <p>输 <code>zfb</code> 能找到「支付宝」，输 <code>zhifubao</code> 也行。几百条记录里找东西，永远是敲几个字母的事。</p>
+      </article>
+
+      <article class="card reveal">
+        <span class="card-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        <h3>动态口令内置</h3>
+        <p>支持 TOTP 两步验证码，带倒计时，复制即用。不用再为了一个验证码去掏手机、切换 App。</p>
+      </article>
+
+      <article class="card reveal">
+        <span class="card-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 1 2.4 5.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4 18v-5h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3>改动留痕，垃圾可清</h3>
+        <p>密码每变一次就留一个历史版本，随时回看旧密码。历史里堆的重复快照，一键清理，清理前自动备份。</p>
+      </article>
+
+      <article class="card reveal">
+        <span class="card-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M13 12h8M18 12v3M15.5 12v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+        <h3>明暗主题 · 字体可调</h3>
+        <p>深色浅色随手切换，整体字号也能缩放。排在屏幕前一整晚整理账号，眼睛会感谢你。</p>
+      </article>
+
+      <article class="card reveal">
+        <span class="card-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 12h17M12 3.5c2.5 2.4 2.5 14.2 0 17M12 3.5c-2.5 2.4-2.5 14.2 0 17" stroke="currentColor" stroke-width="1.7"/></svg></span>
+        <h3>网站图标自动抓取</h3>
+        <p>每条记录自动配上对应网站的图标，认中文名也能匹配到常用站点。列表一眼扫过去，谁是谁清清楚楚。</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 安全 ============ -->
+<section class="section section-alt" id="security">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">SECURITY</span>
+      <h2>把安全做到<span class="grad">可以讲清楚</span></h2>
+      <p>安全不该是一句口号。下面是钥匙窝处理你数据的完整链路，每一步都能对照着验证。</p>
+    </div>
+
+    <div class="security">
+      <ol class="chain">
+        <li class="reveal">
+          <span class="chain-no">01</span>
+          <div><h3>主密码派生密钥</h3><p>你的主密码经过 <strong>Argon2</strong> 密钥派生函数处理，内存与迭代参数按抗 GPU 暴力破解设计。密码本身不落盘、不上传。</p></div>
+        </li>
+        <li class="reveal">
+          <span class="chain-no">02</span>
+          <div><h3>整库 AES-256 加密</h3><p>所有条目在内存里就是加密的，落盘时整库再经 <strong>AES-256</strong> 加密。文件被拷走，也只是一堆密文。</p></div>
+        </li>
+        <li class="reveal">
+          <span class="chain-no">03</span>
+          <div><h3>进程与磁盘全程本地</h3><p>解锁、检索、保存全部在本机完成。程序不发起任何上传，断网状态下功能完全不受影响。</p></div>
+        </li>
+        <li class="reveal">
+          <span class="chain-no">04</span>
+          <div><h3>扩展只在本地回环通信</h3><p>浏览器扩展通过 <code>127.0.0.1</code> 和本机程序对话，并携带每次生成的访问令牌，外部网络无法触达。</p></div>
+        </li>
+        <li class="reveal">
+          <span class="chain-no">05</span>
+          <div><h3>剪贴板自动清除</h3><p>复制密码后按设定时间自动清空剪贴板，避免密码长期躺在历史记录里被别的程序捡走。</p></div>
+        </li>
+        <li class="reveal">
+          <span class="chain-no">06</span>
+          <div><h3>危险操作先备份</h3><p>清理重复历史这类改动数据的操作，会先把数据库原样备份成 <code>.bak-日期时间</code> 文件，随时可以退回去。</p></div>
+        </li>
+      </ol>
+
+      <aside class="sec-card reveal">
+        <h3>我们没有的东西</h3>
+        <ul class="nolist">
+          <li>没有账号系统，也就没有「找回密码」的后门</li>
+          <li>没有云同步，也就没有厂商跑路后你的数据在谁手上的问题</li>
+          <li>没有埋点统计，程序不需要知道你在存什么</li>
+          <li>没有订阅与等级，功能不靠续费解锁</li>
+        </ul>
+        <div class="sec-note">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4.4-3 8.2-7 10-4-1.8-7-5.6-7-10V6l7-3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12l2 2 4-4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span><b>主密码务必自己记牢。</b>正是因为它只在你手上，忘记主密码后没有任何人能帮你恢复。</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 浏览器扩展 ============ -->
+<section class="section" id="extension">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">BROWSER EXTENSION</span>
+      <h2>让浏览器<span class="grad">自己把密码填上</span></h2>
+      <p>配套 Chrome / Edge 扩展，登录页面上的输入框旁边会出现一个小盾牌，点一下账号密码就位。</p>
+    </div>
+
+    <div class="ext">
+      <div class="ext-steps">
+        <div class="step reveal">
+          <span class="step-no">1</span>
+          <div><h3>在设置里开启扩展服务</h3><p>打开钥匙窝 → 设置 → 浏览器扩展，一键启用并解锁数据库。服务只监听本机回环地址。</p></div>
+        </div>
+        <div class="step reveal">
+          <span class="step-no">2</span>
+          <div><h3>加载扩展</h3><p>下载扩展包（<a href="download/YaoShiWo-chrome-extension.zip">.zip</a>）解压到任意目录；Chrome 地址栏进入 <code>chrome://extensions</code>，打开开发者模式，选择「加载已解压的扩展程序」，指向解压出来的文件夹。</p></div>
+        </div>
+        <div class="step reveal">
+          <span class="step-no">3</span>
+          <div><h3>开始自动填充</h3><p>打开任意登录页，输入框旁的小图标就是它。新注册的账号，扩展会问你要不要顺手存进保险库。</p></div>
+        </div>
+      </div>
+
+      <div class="ext-visual reveal">
+        <div class="browser">
+          <div class="browser-bar">
+            <span class="b-url"><i class="lock"></i>https://www.taobao.com/login</span>
+            <span class="b-ext"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4.4-3 8.2-7 10-4-1.8-7-5.6-7-10V6l7-3z" fill="currentColor"/></svg></span>
+          </div>
+          <div class="browser-body">
+            <div class="form-row">
+              <label>账号</label>
+              <span class="input filled">my-account<em class="fill-tag">已填充</em></span>
+            </div>
+            <div class="form-row">
+              <label>密码</label>
+              <span class="input filled">••••••••••<em class="fill-tag">已填充</em></span>
+            </div>
+            <div class="form-btn">登 录</div>
+          </div>
+          <div class="ext-pop">
+            <span class="ext-pop-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4.4-3 8.2-7 10-4-1.8-7-5.6-7-10V6l7-3z" fill="currentColor"/></svg></span>
+            <div><b>检测到新账号</b><i>是否保存到钥匙窝？</i></div>
+            <span class="ext-pop-btn">保存</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 对比 ============ -->
+<section class="section section-alt" id="compare">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">WHY LOCAL</span>
+      <h2>云端很方便，<span class="grad">本地更安心</span></h2>
+      <p>把密码交给别人的服务器，本质上是用便利换信任。钥匙窝选择把信任还给你自己。</p>
+    </div>
+
+    <div class="compare reveal">
+      <div class="cmp-col cmp-a">
+        <h3>云端密码管理器</h3>
+        <ul>
+          <li>数据存放在厂商的服务器上</li>
+          <li>必须注册账号、同意协议</li>
+          <li>断网时基本不可用</li>
+          <li>服务调整或关停，导出能力受限</li>
+          <li>高级功能往往需要持续订阅</li>
+          <li>你的保险库安全等级＝厂商的安全等级</li>
+        </ul>
+      </div>
+      <div class="cmp-col cmp-b">
+        <div class="cmp-flag">钥匙窝</div>
+        <h3>本机密码库</h3>
+        <ul>
+          <li>数据始终在你自己的硬盘上</li>
+          <li>无需注册，打开即用</li>
+          <li>断网、内网、离线环境完全可用</li>
+          <li>标准 KDBX 文件，随时可被 KeePass 打开</li>
+          <li>没有账号体系，也就没有订阅</li>
+          <li>你的保险库安全等级＝你的主密码强度</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 更新日志 ============ -->
+<section class="section" id="changelog">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">CHANGELOG</span>
+      <h2>v1.2.0：<span class="grad">改名「钥匙窝」，外加 4 处改动</span></h2>
+      <p>软件正式定名 <b>钥匙窝</b>（英文 YaoShiWo）。功能和数据一律照旧：你的 .kdbx 文件、设置、浏览器扩展配对都不受影响。</p>
+    </div>
+
+    <div class="log">
+      <article class="log-item reveal">
+        <span class="log-tag">00</span>
+        <div>
+          <h3>有了自己的名字：钥匙窝</h3>
+          <p>密码是钥匙，钥匙该待在自己家里。改名不改内核——依旧是本地加密、不上传云端、兼容 KeePass 的密码管理器，只是从此这个名字在搜索结果里只指向这一个官网。</p>
+        </div>
+      </article>
+      <article class="log-item reveal">
+        <span class="log-tag">01</span>
+        <div>
+          <h3>关掉窗口 ≠ 退出程序</h3>
+          <p>点关闭默认收进状态栏，后台继续待命，浏览器扩展照样能填充与保存。首次会问你想怎么关，也可以在设置里固定为「每次询问 / 放到状态栏 / 永久关闭」。</p>
+        </div>
+      </article>
+      <article class="log-item reveal">
+        <span class="log-tag">02</span>
+        <div>
+          <h3>不再自动锁定</h3>
+          <p>以前闲置一会儿就自动锁上，浏览器扩展立刻失灵。现在默认不自动锁定，只有你自己点「锁定」或按 <kbd>Ctrl</kbd>+<kbd>L</kbd> 时才锁。</p>
+        </div>
+      </article>
+      <article class="log-item reveal">
+        <span class="log-tag">03</span>
+        <div>
+          <h3>「最近使用」可以删了</h3>
+          <p>首页最近打开列表的每一项右边都有删除按钮，只把它从列表里去掉，不会动你的数据库文件。</p>
+        </div>
+      </article>
+      <article class="log-item reveal">
+        <span class="log-tag">04</span>
+        <div>
+          <h3>重复的密码历史，一键清理</h3>
+          <p>旧版本里改个标题都会留下历史快照，越堆越多。现在只有密码真正变化才记一笔，历史里的重复记录可以在条目详情或设置里一键清掉，清理前自动备份数据库。</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 常见问题 ============ -->
+<section class="section section-alt" id="faq">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">FAQ</span>
+      <h2>你可能想问的</h2>
+    </div>
+
+    <div class="faq reveal">
+      <details open>
+        <summary>我的数据会被上传到你们服务器吗？<span class="chev"></span></summary>
+        <div class="faq-body"><p>不会。钥匙窝没有账号系统，也没有任何上传通道，程序的网络行为只包括本地回环通信（浏览器扩展）和你主动触发的网站图标抓取。你可以断网试用，功能一个都不会少。</p></div>
+      </details>
+      <details>
+        <summary>忘记主密码怎么办？<span class="chev"></span></summary>
+        <div class="faq-body"><p>没有后门，谁也恢复不了——这正是本地加密该有的样子。所以请务必把主密码记牢，建议同时保留一份数据库文件备份（例如 <code>.kdbx</code> 的副本），并把主密码保存在你能长期掌控的地方。</p></div>
+      </details>
+      <details>
+        <summary>能和 KeePass 互相打开吗？<span class="chev"></span></summary>
+        <div class="faq-body"><p>可以，这是重点功能之一。钥匙窝读写的是 KeePass 2 的标准 KDBX 4 格式，两边都能打开同一份文件并正确保存，迁移与回退都没有障碍。</p></div>
+      </details>
+      <details>
+        <summary>支持多设备同步吗？<span class="chev"></span></summary>
+        <div class="faq-body"><p>同步这件事我们交还给你：可以用 U 盘、你自己的网盘目录、或者你自己的私有服务器来存放那个 <code>.kdbx</code> 文件。钥匙窝只负责把文件写对、写好，不参与你的数据流转。</p></div>
+      </details>
+      <details>
+        <summary>支持哪些系统？<span class="chev"></span></summary>
+        <div class="faq-body"><p>当前版本面向 Windows 10 / 11 的 64 位系统，提供安装版与免安装版两种形态。浏览器扩展适用于 Chrome 及基于 Chromium 的浏览器（含 Edge）。</p></div>
+      </details>
+      <details>
+        <summary>装完之后怎么开始？<span class="chev"></span></summary>
+        <div class="faq-body"><p>三步：下载安装 → 选择已有数据库或新建一个（新建需设置主密码）→ 在设置里开启浏览器扩展并按提示加载扩展。数据库文件默认就是普通文件，你想放哪就放哪。</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 下载 ============ -->
+<section class="section download" id="download">
+  <div class="orb orb-c" aria-hidden="true"></div>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">DOWNLOAD</span>
+      <h2>现在就把钥匙<span class="grad">拿回自己手里</span></h2>
+      <p>下载即用，不需要注册，也不会有人来问你手机号。</p>
+    </div>
+
+    <div class="dl-grid">
+      <a class="dl-card reveal" href="download/YaoShiWo-Setup-1.2.0.exe">
+        <span class="dl-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h3>安装版</h3>
+        <p>推荐。带开始菜单与桌面快捷方式，可正常卸载。</p>
+        <span class="dl-meta">YaoShiWo-Setup-1.2.0.exe · 约 81 MB</span>
+        <span class="dl-btn">下载安装包</span>
+      </a>
+      <a class="dl-card reveal" href="download/YaoShiWo-portable.exe">
+        <span class="dl-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M9 12h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        <h3>免安装版</h3>
+        <p>单文件运行，放进 U 盘随身带走，不写系统目录。</p>
+        <span class="dl-meta">YaoShiWo-portable.exe · 约 81 MB</span>
+        <span class="dl-btn">下载免安装版</span>
+      </a>
+      <a class="dl-card reveal" href="download/YaoShiWo-chrome-extension.zip">
+        <span class="dl-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18M7 15h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        <h3>浏览器扩展</h3>
+        <p>配合程序使用，实现登录页自动填充与新账号保存。</p>
+        <span class="dl-meta">YaoShiWo-chrome-extension.zip · 约 17 KB</span>
+        <span class="dl-btn">下载扩展</span>
+      </a>
+    </div>
+
+    <p class="dl-note reveal">安装前建议先完全退出正在运行的钥匙窝（托盘图标右键 → 退出），避免文件被占用。</p>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ 页脚 ============ -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span class="nav-logo">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2.2l7.2 3.4v5.9c0 4.6-3.1 8.7-7.2 10.9-4.1-2.2-7.2-6.3-7.2-10.9V5.6L12 2.2z" fill="currentColor"/>
+          <path d="M8.6 12.1l2.3 2.3 4.5-4.6" stroke="#0b1220" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <div>
+        <b>钥匙窝</b>
+        <i>本地密码管理器 · 数据只存在你自己电脑上</i>
+      </div>
+    </div>
+    <nav class="footer-links">
+      <a href="#features">功能</a>
+      <a href="#security">安全</a>
+      <a href="#extension">浏览器扩展</a>
+      <a href="#changelog">更新日志</a>
+      <a href="#download">下载</a>
+    </nav>
+    <p class="footer-copy">© 2026 钥匙窝 YaoShiWo · 本地优先的密码管理方案</p>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

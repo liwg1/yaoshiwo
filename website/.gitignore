@@ -1,0 +1,11 @@
+# 自检生成的整页截图，不需要进仓库
+preview/
+
+# 安装包（每个 80MB，GitHub 单文件限制 100MB、仓库也不适合放二进制）
+# 需要让用户下载时，请用 GitHub Releases 上传，或直接从你的服务器提供
+download/*.exe
+
+# 系统垃圾
+Thumbs.db
+Desktop.ini
+.DS_Store

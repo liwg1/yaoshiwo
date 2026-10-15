@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 900px; height: 383px; overflow: hidden; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    background: #0b1220; color: #e8eefc; position: relative;
+  }
+  .bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(760px 420px at 8% -12%, rgba(56,189,248,.22), transparent 62%),
+      radial-gradient(680px 400px at 92% 112%, rgba(99,102,241,.30), transparent 64%),
+      linear-gradient(138deg, #0a1020 0%, #101a34 46%, #0b1428 100%);
+  }
+  .grid {
+    position: absolute; inset: 0; opacity: .18;
+    background-image:
+      linear-gradient(rgba(148,197,255,.26) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,197,255,.26) 1px, transparent 1px);
+    background-size: 34px 34px;
+    -webkit-mask-image: radial-gradient(680px 420px at 22% 40%, #000 0%, transparent 78%);
+    mask-image: radial-gradient(680px 420px at 22% 40%, #000 0%, transparent 78%);
+  }
+  .mark {
+    position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+    width: 290px; height: 290px; opacity: .09;
+  }
+  .glow {
+    position: absolute; right: -40px; top: -60px; width: 420px; height: 300px;
+    background: radial-gradient(closest-side, rgba(56,189,248,.30), transparent 72%);
+  }
+  .wrap {
+    position: absolute; inset: 0; padding: 38px 52px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .top { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    width: 52px; height: 52px; border-radius: 15px; display: grid; place-items: center;
+    background: linear-gradient(145deg, #38bdf8, #6366f1);
+    box-shadow: 0 12px 30px rgba(56,189,248,.34), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .logo svg { width: 29px; height: 29px; }
+  .brand { font-size: 25px; font-weight: 700; letter-spacing: .6px; }
+  .brand small { display: block; font-size: 13px; font-weight: 400; color: #8ea6cc; margin-top: 3px; letter-spacing: .4px; }
+  .pill {
+    margin-left: auto; font-size: 15.5px; font-weight: 700; padding: 8px 18px; border-radius: 999px;
+    background: rgba(56,189,248,.14); border: 1px solid rgba(56,189,248,.5); color: #7dd3fc;
+    letter-spacing: .8px;
+  }
+  h1 { font-size: 46px; line-height: 1.14; font-weight: 800; letter-spacing: -.4px; }
+  h1 b { font-size: 58px; font-weight: 800; margin-right: 6px; letter-spacing: -1px; }
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(92deg, #7dd3fc 6%, #a5b4fc 94%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub {
+    margin-top: 11px; font-size: 18px; font-weight: 700; color: #fde68a; letter-spacing: .8px;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .sub .dot { width: 7px; height: 7px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 12px rgba(251,191,36,.9); }
+  .chips { margin-top: 15px; display: flex; gap: 9px; }
+  .chip {
+    font-size: 14px; padding: 7px 13px; border-radius: 10px; color: #c7d5ea;
+    background: rgba(148,163,184,.12); border: 1px solid rgba(148,163,184,.24);
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <svg class="mark" viewBox="0 0 24 24" fill="none">
+    <path d="M12 2.2l7.2 3.4v5.9c0 4.6-3.1 8.7-7.2 10.9-4.1-2.2-7.2-6.3-7.2-10.9V5.6L12 2.2z" fill="#7dd3fc"/>
+    <path d="M8.6 12.1l2.3 2.3 4.5-4.6" stroke="#0b1220" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2.2l7.2 3.4v5.9c0 4.6-3.1 8.7-7.2 10.9-4.1-2.2-7.2-6.3-7.2-10.9V5.6L12 2.2z" fill="#fff"/>
+          <path d="M8.6 12.1l2.3 2.3 4.5-4.6" stroke="#1b2a4a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand">钥匙窝 YaoShiWo<small>本地密码管理器 · 数据只存在你自己电脑上</small></div>
+      <div class="pill">v1.2.0 更新</div>
+    </div>
+
+    <div>
+      <h1><b>4</b>处改动<br /><em>日常用起来顺多了</em></h1>
+      <div class="sub"><span class="dot"></span>强烈推荐更新体验</div>
+      <div class="chips">
+        <div class="chip">关闭行为可选</div>
+        <div class="chip">不再自动锁定</div>
+        <div class="chip">重复历史可清理</div>
+        <div class="chip">最近记录可删除</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

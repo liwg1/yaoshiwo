@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+# 自检截图不用被抓取
+Disallow: /preview/
+
+# 三个搜索引擎都支持 sitemap 声明（上线时把域名换成你自己的）
+Sitemap: https://yaoshiwo.cn/sitemap.xml

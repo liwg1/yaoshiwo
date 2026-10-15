@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<style>
+  /* 1200×630 社交分享图（微信 / QQ / GitHub / Twitter 卡片都用这一张） */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+    background: #0b1220; color: #e8eefc; position: relative;
+  }
+  .bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(900px 520px at 6% -14%, rgba(56,189,248,.24), transparent 62%),
+      radial-gradient(820px 480px at 94% 114%, rgba(99,102,241,.32), transparent 64%),
+      linear-gradient(138deg, #0a1020 0%, #101a34 46%, #0b1428 100%);
+  }
+  .grid {
+    position: absolute; inset: 0; opacity: .16;
+    background-image:
+      linear-gradient(rgba(148,197,255,.26) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,197,255,.26) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(900px 560px at 20% 40%, #000 0%, transparent 78%);
+    mask-image: radial-gradient(900px 560px at 20% 40%, #000 0%, transparent 78%);
+  }
+  .mark {
+    position: absolute; right: 46px; top: 50%; transform: translateY(-50%);
+    width: 400px; height: 400px; opacity: .08;
+  }
+  .glow {
+    position: absolute; right: -60px; top: -80px; width: 560px; height: 400px;
+    background: radial-gradient(closest-side, rgba(56,189,248,.30), transparent 72%);
+  }
+  .wrap {
+    position: absolute; inset: 0; padding: 56px 68px 50px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .top { display: flex; align-items: center; gap: 18px; }
+  .logo {
+    width: 68px; height: 68px; border-radius: 20px; display: grid; place-items: center;
+    background: linear-gradient(145deg, #38bdf8, #6366f1);
+    box-shadow: 0 14px 36px rgba(56,189,248,.34), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .logo svg { width: 38px; height: 38px; }
+  .brand { font-size: 33px; font-weight: 700; letter-spacing: .6px; }
+  .brand small { display: block; font-size: 16px; font-weight: 400; color: #8ea6cc; margin-top: 5px; letter-spacing: .6px; }
+  .pill {
+    margin-left: auto; font-size: 18px; font-weight: 700; padding: 10px 22px; border-radius: 999px;
+    background: rgba(56,189,248,.14); border: 1px solid rgba(56,189,248,.5); color: #7dd3fc;
+    letter-spacing: .8px;
+  }
+  h1 { font-size: 62px; line-height: 1.16; font-weight: 800; letter-spacing: -.6px; }
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(92deg, #7dd3fc 6%, #a5b4fc 94%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub {
+    margin-top: 16px; font-size: 24px; font-weight: 600; color: #c7d5ea; letter-spacing: 1px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sub .dot { width: 8px; height: 8px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 14px rgba(56,189,248,.9); }
+  .bottom { display: flex; align-items: center; gap: 12px; }
+  .chip {
+    font-size: 17px; padding: 10px 16px; border-radius: 12px; color: #c7d5ea;
+    background: rgba(148,163,184,.12); border: 1px solid rgba(148,163,184,.24);
+  }
+  .free {
+    margin-left: auto; font-size: 19px; font-weight: 800; color: #fde68a; letter-spacing: .8px;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .free .d { width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 14px rgba(251,191,36,.9); }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <svg class="mark" viewBox="0 0 24 24" fill="none">
+    <path d="M12 2.2l7.2 3.4v5.9c0 4.6-3.1 8.7-7.2 10.9-4.1-2.2-7.2-6.3-7.2-10.9V5.6L12 2.2z" fill="#7dd3fc"/>
+    <path d="M8.6 12.1l2.3 2.3 4.5-4.6" stroke="#0b1220" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+
+  <div class="wrap">
+    <div class="top">
+      <span class="logo">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2.2l7.2 3.4v5.9c0 4.6-3.1 8.7-7.2 10.9-4.1-2.2-7.2-6.3-7.2-10.9V5.6L12 2.2z" fill="#fff"/>
+          <path d="M8.6 12.1l2.3 2.3 4.5-4.6" stroke="#0b1220" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="brand">钥匙窝 YaoShiWo<small>Windows 密码管理器 · 数据只存在你自己电脑上</small></span>
+      <span class="pill">v1.2.0</span>
+    </div>
+
+    <div>
+      <h1>你的密码，<br /><em>只属于你自己</em></h1>
+      <div class="sub"><span class="dot"></span>本地加密 · 不上传云端 · 兼容 KeePass 2</div>
+    </div>
+
+    <div class="bottom">
+      <span class="chip">AES-256 整库加密</span>
+      <span class="chip">Argon2 密钥派生</span>
+      <span class="chip">KDBX 4 标准格式</span>
+      <span class="chip">浏览器自动填充</span>
+      <span class="free"><span class="d"></span>完全免费</span>
+    </div>
+  </div>
+</body>
+</html>
