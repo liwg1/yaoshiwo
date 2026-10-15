@@ -1,0 +1,18 @@
+# 服务器安全体检（只读命令，不做任何修改）
+# 用法： node scripts/ssh-run.cjs scripts/.ssh-checks.txt
+redis 进程 | ps -eo pid,user,etime,args | grep [r]edis | head -5
+redis 监听地址 | ss -lntp | grep 6379 || echo "6379 未监听"
+redis 配置里的关键项 | grep -E "^(bind|protected-mode|requirepass|port|appendonly)" /etc/redis/redis.conf 2>/dev/null || echo "没有 /etc/redis/redis.conf"
+redis 本机 ping | redis-cli -h 127.0.0.1 ping 2>&1 | head -3
+redis 是否设了密码 | redis-cli -h 127.0.0.1 config get requirepass 2>&1 | head -3
+redis 版本与连接数 | redis-cli -h 127.0.0.1 info server 2>/dev/null | grep -E "redis_version|uptime_in_seconds" ; redis-cli -h 127.0.0.1 info clients 2>/dev/null | grep connected_clients
+占用内存最多的进程 | ps -eo rss,user,args --sort=-rss | head -8
+占用 CPU 最多的进程 | ps -eo pcpu,user,args --sort=-pcpu | head -8
+最近登录记录 | last -n 6 2>/dev/null | head -7
+失败的登录尝试 | grep -c "Failed password" /var/log/auth.log 2>/dev/null || echo "读不到 auth.log"
+root 的计划任务 | crontab -l 2>/dev/null | head -10 || echo "无 root crontab"
+所有用户的计划任务 | ls -l /etc/cron.d/ 2>/dev/null | head -10
+临时目录里有没有可疑文件 | ls -la /tmp /dev/shm /var/tmp 2>/dev/null | head -30
+开机自启的服务 | ls -l /etc/systemd/system/multi-user.target.wants/ 2>/dev/null | head -15 || echo "无法读取"
+已安装的 apt 包数量 | dpkg -l | wc -l
+磁盘占用前几的目录 | du -sh /var/* 2>/dev/null | sort -rh | head -6

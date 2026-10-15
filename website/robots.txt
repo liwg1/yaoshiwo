@@ -2,6 +2,8 @@ User-agent: *
 Allow: /
 # 自检截图不用被抓取
 Disallow: /preview/
+# 安装包目录不抓（几十 MB 的二进制文件只会浪费抓取配额，页面上的下载链接照常被抓）
+Disallow: /download/
 
-# 三个搜索引擎都支持 sitemap 声明（上线时把域名换成你自己的）
+# 三个搜索引擎都支持 sitemap 声明
 Sitemap: https://yaoshiwo.cn/sitemap.xml
