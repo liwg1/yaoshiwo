@@ -2,7 +2,7 @@
 
 > 本地优先、不上传云端的 Windows 密码管理器 · 直接读写 KeePass 2 的 `.kdbx` 文件
 
-[官网](https://yaoshiwo.cn) · [下载最新版](https://yaoshiwo.cn/#download) · [MIT 协议](LICENSE)
+[官网](https://yaoshiwo.cn) · [下载最新版](https://yaoshiwo.cn/#download) · [更新日志](CHANGELOG.md) · [MIT 协议](LICENSE)
 
 ---
 
@@ -131,7 +131,9 @@ npm run package:dir    # 只出解包目录，调试打包问题时用
 | `node scripts/serve-site.cjs 8125` | 零依赖静态服务器，本地预览官网（`http://127.0.0.1:8125/`） |
 | `node scripts/smoke-app.cjs` | 启动打包后的真实程序，用 CDP 读窗口标题、页面文字、版本号，冒烟验证 |
 | `node scripts/make-cover.cjs` / `make-og.cjs` | 用 HTML 生成公众号封面 / 社交分享卡片 PNG |
-| `node scripts/deploy-aliyun.cjs recon|deploy|status` | 把官网部署到自己的服务器（密码只从环境变量读，见脚本头部注释） |
+| `node scripts/deploy-aliyun.cjs recon\|deploy\|netcheck\|https\|status` | 部署官网到自己服务器：侦察 / 部署 / 排查外网不通 / 申请 HTTPS / 查线上状态（凭据只从环境变量读，见脚本头部注释） |
+| `node scripts/verify-deploy.cjs` | 用 sha256 逐字节比对线上文件与本地文件（只看 HTTP 200 是不够的：旧文件也会返回 200） |
+| `node scripts/push-github.cjs` | 自动建仓库 + 推送（需要 `GITHUB_TOKEN`，GitHub 已不支持密码认证） |
 
 ## 一个值得单独说的坑：KeePass 的 KDBX 4 时间格式
 

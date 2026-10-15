@@ -36,17 +36,19 @@ node scripts/serve-site.cjs 8125
 
 方式三：用任意静态服务器（宝塔 / nginx / `npx serve`）指向 `website/` 目录。
 
-## 上线前要做的三件事
+## 上线要做的事
 
-1. **替换域名占位符**：`index.html`、`sitemap.xml`、`robots.txt` 里的 `yaoshiwo.cn` 全部换成你的真实域名（`node scripts/audit-site.cjs` 会提醒还剩几处）。
+1. **域名（已完成）**：全站域名是 `https://yaoshiwo.cn`，`index.html` / `sitemap.xml` / `robots.txt` 都已指向它，`node scripts/audit-site.cjs` 输出 ✅。要换域名请照 `DEPLOY.md` 第一节的命令全局替换。
 
-2. **放安装包（已放好，换版本时需要重做）**：把打包产物复制到 `website/download/` 并改成页面里写的文件名：
+2. **部署（一条命令）**：`node scripts/deploy-aliyun.cjs deploy`（环境变量 `SAFEVAULT_SSH_HOST` / `SAFEVAULT_SSH_PASS`），细节与「安全组 / DNS / 备案」三件配套设置见 `DEPLOY.md` 第二节。
+
+3. **放安装包（已放好，换版本时需要重做）**：把打包产物复制到 `website/download/` 并改成页面里写的文件名：
    - `E:\Code\harness\safevault\release\YaoShiWo-Setup-1.2.0.exe` → `website/download/YaoShiWo-Setup-1.2.0.exe`（当前已就位，80.8 MB）
    - `E:\Code\harness\safevault\release\YaoShiWo-portable.exe` → `website/download/YaoShiWo-portable.exe`（当前已就位，80.6 MB）
 
    （文件名里带空格在部分服务器/链接里容易出问题，所以统一改成短横线版本。如果换了版本号，记得同步改 `index.html` 里 `#download` 那一段的链接与文件名。）
 
-3. **放浏览器扩展**：`chrome-extension\` 目录已打包成 `website/download/YaoShiWo-chrome-extension.zip`（17 KB），首页「浏览器扩展」那一段和下载卡片都已指向它；扩展内容有改动时重新压缩一次即可：
+4. **放浏览器扩展**：`chrome-extension\` 目录已打包成 `website/download/YaoShiWo-chrome-extension.zip`（17 KB），首页「浏览器扩展」那一段和下载卡片都已指向它；扩展内容有改动时重新压缩一次即可：
 
    ```powershell
    Compress-Archive -Path chrome-extension\* -DestinationPath website\download\YaoShiWo-chrome-extension.zip -Force

@@ -292,6 +292,81 @@ async function deploy(conn) {
   console.log('  3. 域名备案通过后（未备案时 80 端口会被阿里云拦截）再跑：node scripts/deploy-aliyun.cjs https')
 }
 
+async function netcheck(conn) {
+  console.log('===== 排查「外面为什么访问不到」=====')
+  for (const [label, cmd] of [
+    ['本机 IP', 'hostname -I; echo "---"; ip -4 addr show | grep -E "inet " | head -5'],
+    ['本机自测 127.0.0.1:80', 'curl -s -o /dev/null -w "HTTP %{http_code}" --max-time 6 http://127.0.0.1/'],
+    ['本机自测公网 IP:80', `curl -s -o /dev/null -w "HTTP %{http_code}" --max-time 6 http://${HOST}/ || echo "（本机绕公网 IP 也不通）"`],
+    ['本机自测域名:80', `curl -s -o /dev/null -w "HTTP %{http_code}" --max-time 6 -H "Host: ${DOMAIN}" http://127.0.0.1/`],
+    ['iptables 规则', 'iptables -S 2>/dev/null | head -25 || echo "（无 iptables 或无权限）"'],
+    ['iptables 统计（有没有被丢包）', 'iptables -L INPUT -v -n 2>/dev/null | head -8 || echo "（读不到）"'],
+    ['nftables', 'nft list ruleset 2>/dev/null | head -20 || echo "（没有 nft 规则）"'],
+    ['ufw', 'ufw status 2>/dev/null || echo "（无 ufw）"'],
+    ['firewalld', 'firewall-cmd --state 2>/dev/null || echo "（无 firewalld）"'],
+    ['云盾/安全插件', 'ps -eo args | grep -Ei "[a]liyun|[a]egis|[c]loudmonitor" | head -5 || echo "（没看到阿里云安全插件）"'],
+    ['监听情况', 'ss -lntp | grep -E ":80|:443" || echo "80/443 没在监听"']
+  ]) {
+    const r = await sh(conn, cmd)
+    console.log(`\n— ${label} —\n${(r.out || r.err).trim() || '(空)'}`)
+  }
+  console.log('\n结论怎么看：')
+  console.log('  · 本机自测公网 IP 通、外面不通 → 阿里云安全组没放行（去控制台加入方向 80/443）')
+  console.log('  · 本机自测公网 IP 也不通 → 公网 IP 是 NAT 映射，重点看安全组')
+  console.log('  · iptables 里有 DROP/REJECT 且计数在涨 → 是本机防火墙，可以自己修')
+}
+
+async function https(conn) {
+  console.log('===== 配置 HTTPS（Let\'s Encrypt）=====')
+  const resolved = (await sh(conn, `getent hosts ${DOMAIN} || true`)).out.trim()
+  console.log(`${DOMAIN} 在本机解析：${resolved || '（解析不到）'}`)
+  if (!resolved) {
+    console.log('\n域名还没解析到这台服务器，证书签不下来（Let\'s Encrypt 要从公网访问验证）。')
+    console.log('请先在域名服务商处加 A 记录：')
+    console.log(`   ${DOMAIN}      → ${HOST}`)
+    console.log(`   www.${DOMAIN}  → ${HOST}`)
+    console.log('等 DNS 生效（一般几分钟到几小时）后再跑一次：node scripts/deploy-aliyun.cjs https')
+    return
+  }
+
+  const has = (await sh(conn, 'command -v certbot || true')).out.trim()
+  if (!has) {
+    console.log('安装 certbot …')
+    const inst = await sh(
+      conn,
+      'export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && apt-get install -y -qq certbot python3-certbot-nginx',
+      { timeout: 900000 }
+    )
+    console.log(inst.out.split('\n').slice(-5).join('\n'))
+  }
+  const nowHas = (await sh(conn, 'command -v certbot || true')).out.trim()
+  if (!nowHas) throw new Error('certbot 安装失败')
+
+  const email = process.env.SAFEVAULT_ACME_EMAIL
+  const mailArg = email ? `-m ${email}` : '--register-unsafely-without-email'
+  console.log('申请证书并自动改 nginx 配置（含 80 → 443 跳转）…')
+  const r = await sh(
+    conn,
+    `certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --non-interactive --agree-tos ${mailArg} --redirect 2>&1 | tail -25`,
+    { timeout: 300000 }
+  )
+  console.log(r.out.trim())
+
+  console.log('\n—— 复核 ——')
+  for (const [label, cmd] of [
+    ['证书文件', `ls -1 /etc/letsencrypt/live/${DOMAIN}/ 2>/dev/null || echo "没有证书"`],
+    ['证书有效期', `openssl x509 -enddate -noout -in /etc/letsencrypt/live/${DOMAIN}/fullchain.pem 2>/dev/null || true`],
+    ['自动续期定时任务', 'systemctl list-timers 2>/dev/null | grep -i certbot || ls -l /etc/cron.d/certbot* 2>/dev/null || echo "（检查 certbot renew 是否已配）"'],
+    ['本机 https 测试', `curl -sk -o /dev/null -w "HTTP %{http_code}" --max-time 8 https://127.0.0.1/ -H "Host: ${DOMAIN}"`],
+    ['http 是否跳转', `curl -s -o /dev/null -w "HTTP %{http_code} → %{redirect_url}" --max-time 8 -H "Host: ${DOMAIN}" http://127.0.0.1/`]
+  ]) {
+    const rr = await sh(conn, cmd)
+    console.log(`  ${label}：${(rr.out || rr.err).trim()}`)
+  }
+  console.log('\n提示：证书 90 天自动续期由 certbot 的定时任务负责；这台机器 systemd 不太正常，')
+  console.log('      建议顺手加一条 crontab：0 3 * * * certbot renew --quiet --post-hook "nginx -s reload"')
+}
+
 async function status(conn) {
   console.log('===== 线上状态检查 =====')
   for (const [label, cmd] of [
@@ -318,9 +393,11 @@ async function status(conn) {
     console.log('已登录服务器\n')
     if (mode === 'recon') await recon(conn)
     else if (mode === 'deploy') await deploy(conn)
+    else if (mode === 'netcheck') await netcheck(conn)
+    else if (mode === 'https') await https(conn)
     else if (mode === 'status') await status(conn)
     else {
-      console.error('未知模式：' + mode + '（可用：recon / deploy / status）')
+      console.error('未知模式：' + mode + '（可用：recon / deploy / netcheck / https / status）')
       process.exitCode = 2
     }
   } catch (e) {

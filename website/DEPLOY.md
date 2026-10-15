@@ -4,29 +4,58 @@
 
 ---
 
-## 一、上线前必须做的一件事：替换域名占位符
+## 一、域名（当前已配置：`yaoshiwo.cn`）
 
-全站有 4 个文件写着占位域名 `yaoshiwo.cn`，上线前全部替换成你的真实域名：
+全站域名已经替换完毕：`index.html` 的 `canonical` / `og:url` / `og:image` / `twitter:image` / 结构化数据（`url`、`downloadUrl`、`installUrl`、`softwareHelp`、`image`、`screenshot`、`logo.url`）、`sitemap.xml` 的 `<loc>` 与 `<image:loc>`、`robots.txt` 的 `Sitemap:` 行，全部指向 `https://yaoshiwo.cn`。`node scripts/audit-site.cjs` 现在输出 ✅。
 
-| 文件 | 要改的地方 |
-|---|---|
-| `website/index.html` | `<link rel="canonical">`、`og:url`、`og:image`、`twitter:image`、JSON-LD 里的 `url` / `downloadUrl` / `softwareHelp` / `image` / `screenshot` / `logo.url` |
-| `website/sitemap.xml` | `<loc>` 与 `<image:loc>`，顺手把 `lastmod` 改成当天日期 |
-| `website/robots.txt` | 末尾的 `Sitemap:` 一行 |
-
-可以一次改完再检查：
+**以后如果要换域名**（比如再加一个 `.com`），把下面这条命令里的域名换掉再跑一次，然后确认：
 
 ```powershell
 cd E:\Code\harness\safevault
-node -e "const fs=require('fs'),p=require('path');const walk=(d)=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(p.join(d,e.name)):[p.join(d,e.name)]);for(const f of walk('website')){if(!/\.(html|xml|txt)$/.test(f))continue;const s=fs.readFileSync(f,'utf8');const n=(s.match(/YOUR-DOMAIN\.com/g)||[]).length;if(n)console.log(f+' 还有 '+n+' 处');}"
+# 1. 全局替换（含注释）：把旧域名换成新域名
+node -e "const fs=require('fs');const walk=(d)=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(d+'/'+e.name):[d+'/'+e.name]);for(const f of walk('website')){if(!/\.(html|xml|txt|md)$/.test(f))continue;let s=fs.readFileSync(f,'utf8');const n=(s.split('旧域名.com').length-1);if(!n)continue;s=s.split('旧域名.com').join('新域名.com');fs.writeFileSync(f,s,'utf8');console.log(f+' 替换 '+n+' 处')}"
+# 2. 检查是否还有漏网的占位域名或旧域名
 node scripts/audit-site.cjs
 ```
 
-> `audit-site.cjs` 会直接把还没替换的占位域名标成问题，替换干净后才会输出 ✅。
+> `audit-site.cjs` 会把没替换的占位域名直接标成问题，替换干净才会输出 ✅。
 
 ---
 
-## 二、传到阿里云服务器（主站，推荐）
+## 二、一键部署到阿里云（推荐做法）
+
+在项目根目录执行，脚本会自动上传文件、写 nginx 配置、检查语法、重载、并做部署后自检：
+
+```powershell
+cd E:\Code\harness\safevault
+$env:SAFEVAULT_SSH_HOST='你的服务器公网IP'      # 必填
+$env:SAFEVAULT_SSH_PASS='服务器 root 密码'      # 必填（只从环境变量读，绝不写进仓库）
+# 可选：$env:SAFEVAULT_DOMAIN / $env:SAFEVAULT_WEB_ROOT / $env:SAFEVAULT_SSH_USER / $env:SAFEVAULT_SSH_PORT
+
+node scripts/deploy-aliyun.cjs recon      # 只看不动：系统、nginx、磁盘、已有站点、端口占用
+node scripts/deploy-aliyun.cjs deploy     # 正式部署（上传 + 写配置 + 重载 + 自检）
+node scripts/deploy-aliyun.cjs netcheck   # 外面访问不到时，判断是安全组还是本机防火墙
+node scripts/deploy-aliyun.cjs status     # 日常检查线上状态
+node scripts/deploy-aliyun.cjs https      # 域名解析生效后，一键申请 HTTPS 证书并自动跳转
+
+node scripts/verify-deploy.cjs            # 用 sha256 逐字节比对「线上文件 vs 本地文件」
+```
+
+`verify-deploy.cjs` 这一步别省：只看到「HTTP 200」不算数——万一是旧文件或上传中断，页面照样返回 200。哈希比对才能确认线上跑的就是你本地这一份。
+
+**首次上线的三件配套设置（缺一不可）：**
+
+| 事项 | 在哪里做 | 说明 |
+| --- | --- | --- |
+| 放行 80 / 443 | 阿里云控制台 → ECS → 安全组 → 入方向 | 不加这条，外面访问会**超时**（不是拒绝，是数据包被丢弃）。用 `netcheck` 可以确认是不是这个原因 |
+| 域名解析 | 域名服务商 → DNS 解析 | 加 A 记录：`yaoshiwo.cn` 与 `www.yaoshiwo.cn` → 服务器公网 IP |
+| ICP 备案 | 阿里云控制台 → 备案 | **大陆服务器未备案的域名会被拦截**，这一步没完成前，域名指向大陆服务器无法正常对外提供服务；备案期间 IP 直连也不稳定，建议先备案再发文章宣传 |
+
+> 顺带提醒：服务器的 `systemd` 可能不可用（`systemctl is-active nginx` 报 bus 错误），此时 `nginx -s reload` 仍然有效——脚本已经优先用后者。另外这台机器上如果已经有别的站点（比如跑在 8080 的另一个站），本脚本**不会**动它的配置，新站只按 `server_name` 匹配自己的域名。
+
+---
+
+## 三、手动上传（不想用脚本时）
 
 1. 上传：用 WinSCP / 宝塔 / scp 把整个 `website/` 目录传到服务器（`preview/` 可以不上传，它是自检截图）。
 2. Nginx 站点配置（`/etc/nginx/conf.d/yaoshiwo.conf`）：
@@ -72,7 +101,23 @@ server {
 
 ---
 
-## 三、上传到 GitHub
+## 四、上传到 GitHub
+
+仓库已经在本地准备好（`git log` 能看到提交），推上去只需要一个 **Personal Access Token**（GitHub 从 2021 年起关闭了密码认证，用账号密码推送一定失败）：
+
+1. GitHub → 头像 → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)** → Generate new token，勾选 **`repo`**
+2. 然后一条命令搞定（自动建仓库 + 推送 + 打印发 Release 的步骤）：
+
+```powershell
+cd E:\Code\harness\safevault
+$env:GITHUB_TOKEN='ghp_你的令牌'
+node scripts/push-github.cjs              # 默认推到 liwg1/yaoshiwo
+node scripts/push-github.cjs liwg1/别的名字  # 想换仓库名
+```
+
+> 令牌只从环境变量读，脚本**不会**把它写进 `.git/config`（推完会把 origin 重置成不含令牌的干净地址）。
+> 仓库里**不包含**密码库、备份、`node_modules`、安装包——见根目录 `.gitignore`。
+> 安装包（各 80MB）走 **Releases** 附件，不要提交进仓库。
 
 两种玩法，建议都做：
 
@@ -101,7 +146,7 @@ git push -u origin main
 
 ---
 
-## 四、让百度 / 必应优先展示你的官网
+## 五、让百度 / 必应优先展示你的官网
 
 新站想在「密码管理器」这个大词上排第一不现实（前面是 KeePass、Bitwarden、1Password 和一堆软件下载站），但**收录**和**长尾词排名**是完全能做的，步骤如下。
 
@@ -138,7 +183,7 @@ git push -u origin main
 
 ---
 
-## 五、以后每次改动都要做的三件事
+## 六、以后每次改动都要做的三件事
 
 ```powershell
 cd E:\Code\harness\safevault
