@@ -564,6 +564,8 @@ details[open] .chev { transform: rotate(-135deg); border-color: var(--cyan); }
   background: linear-gradient(120deg, var(--cyan), var(--indigo));
 }
 .dl-note { margin-top: 30px; text-align: center; font-size: 13.5px; color: var(--text-3); }
+/* 校验命令很长，窄屏必须允许换行，否则会把页面撑出横向滚动条（390px 实测） */
+.dl-note code { white-space: normal; overflow-wrap: anywhere; }
 
 /* ---------------- 页脚 ---------------- */
 .footer { border-top: 1px solid var(--line); padding: 46px 0; background: rgba(7, 13, 26, 0.85); }
