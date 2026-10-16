@@ -48,11 +48,15 @@ node scripts/serve-site.cjs 8125
 
    （文件名里带空格在部分服务器/链接里容易出问题，所以统一改成短横线版本。如果换了版本号，记得同步改 `index.html` 里 `#download` 那一段的链接与文件名。）
 
-4. **放浏览器扩展**：`chrome-extension\` 目录已打包成 `website/download/YaoShiWo-chrome-extension.zip`（17 KB），首页「浏览器扩展」那一段和下载卡片都已指向它；扩展内容有改动时重新压缩一次即可：
+4. **放浏览器扩展**：`chrome-extension\` 目录已打包成 `website/download/YaoShiWo-chrome-extension.zip`（18 KB，扩展版本 1.2.1），首页「浏览器扩展」那一段和下载卡片都已指向它；扩展内容有改动时重新打包一次即可：
 
    ```powershell
-   Compress-Archive -Path chrome-extension\* -DestinationPath website\download\YaoShiWo-chrome-extension.zip -Force
+   node scripts/make-extension-zip.mjs
    ```
+
+   别用 `Compress-Archive`：Windows PowerShell 5.1 生成的 zip 条目分隔符是反斜杠（`icons\icon16.png`），Chrome 解压后「加载已解压的扩展程序」会失败。`make-extension-zip.mjs` 是自己写的 zip 打包，条目名统一用 `/`，并已回读校验。
+
+5. **更新校验值**：换过安装包或扩展包之后跑一次 `node scripts/gen-sums.cjs`，它会重算三个下载文件的 SHA-256 写进 `download/SHA256SUMS.txt`（首页下载区就指向这个文件）。
 
 ## SEO 已经内置的东西
 

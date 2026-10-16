@@ -4,4 +4,4 @@
 
 2e93a17878aa6fdafbfa49e71a5bcd76df38da32ec30788b78c5990b14eb3255  YaoShiWo-Setup-1.2.0.exe  (84746207 字节)
 015a42510100bf0e3ef4f09fb99ef63c4873d9199e14ed41c53f4d2952f08ca9  YaoShiWo-portable.exe  (84538977 字节)
-1b6280659a33d61f017a2df7d89e1bad8ca9b94f52699a2b60b84dfe0e5e3ccd  YaoShiWo-chrome-extension.zip  (17011 字节)
+d5e1b6e01a3a21d3ddf3c71aa0ce0bbfb630bc958bc4df102f9bda17dfc7b05a  YaoShiWo-chrome-extension.zip  (18364 字节)

@@ -3,10 +3,12 @@
   window.__safevaultInjected = true
 
   const ICON_SIZE = 22
+  const ICON_INSET = 5 // 图标右边缘距离输入框右边缘的像素数
   const MENU_WIDTH = 268
   const MENU_MAX_HEIGHT = 300
 
   const anchors = new Map() // input -> { host, input }
+  let anchorGroups = [] // [[密码框, 用户名框], ...]：同一个登录框内的输入框要共用一列图标
   let menuHost = null
   let filledKey = null
   let matchCache = null // null=未查询, []=无匹配, [...] =有匹配
@@ -167,22 +169,48 @@
     return { host, input }
   }
 
-  function positionAnchor(entry) {
+  // groupRight：同一个登录框内所有输入框共用的「图标右边界」。
+  // 为什么需要它：用户名框和密码框宽度经常不一样（有的用户名框更窄、有的旁边多了个链接），
+  // 各自贴着自身右边缘摆图标就会一高一低、左右错开，看着不协调。
+  function positionAnchor(entry, groupRight) {
     const rect = entry.input.getBoundingClientRect()
     if (rect.width < 8 || rect.height < 8 || rect.bottom < 0 || rect.top > window.innerHeight) {
       entry.host.style.display = 'none'
       return
     }
+    const right = groupRight == null ? rect.right : Math.max(groupRight, rect.right)
     entry.host.style.display = 'block'
-    entry.host.style.left = Math.round(rect.right - ICON_SIZE - 5) + 'px'
-    entry.host.style.top = Math.round(rect.top + (rect.height - ICON_SIZE) / 2) + 'px'
+    entry.host.style.left = Math.round(right - ICON_SIZE - ICON_INSET) + 'px'
+    entry.host.style.top = Math.round(rect.top + rect.height / 2 - ICON_SIZE / 2) + 'px'
     entry.host.style.width = ICON_SIZE + 'px'
     entry.host.style.height = ICON_SIZE + 'px'
+  }
+
+  // 把「一个密码框 + 它的用户名框」算作一组，组内共用同一条右边界
+  function positionAll() {
+    const done = new Set()
+    for (const group of anchorGroups) {
+      let right = null
+      for (const input of group) {
+        const r = input.getBoundingClientRect()
+        if (r.width < 8) continue
+        if (right == null || r.right > right) right = r.right
+      }
+      for (const input of group) {
+        const entry = anchors.get(input)
+        if (!entry || done.has(entry)) continue
+        done.add(entry)
+        positionAnchor(entry, right)
+      }
+    }
+    // 兜底：不在任何分组里的锚点按自身右边缘摆（页面结构变化时可能出现）
+    for (const entry of anchors.values()) if (!done.has(entry)) positionAnchor(entry, null)
   }
 
   function clearAnchors() {
     for (const entry of anchors.values()) entry.host.remove()
     anchors.clear()
+    anchorGroups = []
   }
 
   function syncAnchors() {
@@ -199,20 +227,23 @@
       return
     }
 
-    const targets = new Set()
+    const groups = []
     for (const pwd of passwordFields()) {
-      targets.add(pwd)
+      const group = [pwd]
       const user = findUsernameInput(pwd)
-      if (user) targets.add(user)
+      if (user) group.push(user)
+      groups.push(group)
+      for (const input of group) {
+        if (!anchors.has(input)) anchors.set(input, createAnchor(input))
+      }
     }
-    for (const input of targets) {
-      if (!anchors.has(input)) anchors.set(input, createAnchor(input))
-    }
-    for (const entry of anchors.values()) positionAnchor(entry)
+    // 页面结构变化后，旧分组里可能有已经不在页面上的输入框，过滤掉
+    anchorGroups = groups.map((g) => g.filter((input) => anchors.has(input)))
+    positionAll()
   }
 
   function repositionAll() {
-    for (const entry of anchors.values()) positionAnchor(entry)
+    positionAll()
   }
 
   function scheduleReposition() {
@@ -257,12 +288,21 @@
     }
     .item:hover { background: rgba(37,99,235,.1); }
     .info { flex: 1; min-width: 0; }
-    .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* 主行是账号（用户名）——用户要挑的就是账号，网站地址每行都一样、没必要占着加粗的位置 */
+    .acct {
+      font-weight: 600; font-size: 13.5px; line-height: 1.35;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .acct.empty { color: #94a3b8; font-weight: 500; }
+    .sub {
+      margin-top: 1px; font-size: 11px; color: #64748b;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
     .hint { padding: 10px 8px; font-size: 12px; color: #64748b; line-height: 1.7; }
     @media (prefers-color-scheme: dark) {
       .wrap { background: #1e293b; color: #e2e8f0; border-color: rgba(148,163,184,.25); }
-      .user, .hint, .head { color: #94a3b8; }
+      .sub, .hint, .head { color: #94a3b8; }
+      .acct.empty { color: #64748b; }
       .item:hover { background: rgba(59,130,246,.2); }
     }
   `
@@ -346,9 +386,15 @@
 
     const head = document.createElement('div')
     head.className = 'head'
-    head.textContent = '钥匙窝 · ' + matches.length + ' 个匹配条目'
+    head.textContent =
+      matches.length === 1 ? '钥匙窝 · 1 个账号' : '钥匙窝 · 点一下用哪个账号（' + matches.length + ' 个）'
     wrap.innerHTML = ''
     wrap.appendChild(head)
+
+    // 同一个网站的条目，「标题」往往就是网站名/网址，每行都一样，显示出来只是噪声。
+    // 只有当标题真的能区分子条目（各不相同的自定义标题）时，才放在副行。
+    const titles = new Set(matches.map((m) => (m.title || '').trim()))
+    const titlesAreDistinct = titles.size > 1
 
     matches.forEach((m) => {
       const btn = document.createElement('button')
@@ -356,14 +402,19 @@
       btn.type = 'button'
       const info = document.createElement('div')
       info.className = 'info'
-      const t = document.createElement('div')
-      t.className = 'title'
-      t.textContent = m.title || '(无标题)'
-      const u = document.createElement('div')
-      u.className = 'user'
-      u.textContent = m.username || ''
-      info.appendChild(t)
-      info.appendChild(u)
+      const acct = (m.username || '').trim()
+      const title = (m.title || '').trim()
+      const primary = document.createElement('div')
+      // 没有用户名时退回显示标题，避免整行空白看不出是哪个条目
+      primary.className = acct ? 'acct' : 'acct empty'
+      primary.textContent = acct || title || '(无标题)'
+      info.appendChild(primary)
+      if (acct && title && titlesAreDistinct) {
+        const sub = document.createElement('div')
+        sub.className = 'sub'
+        sub.textContent = title
+        info.appendChild(sub)
+      }
       btn.appendChild(info)
       btn.addEventListener('click', () => {
         fillCredential(m)

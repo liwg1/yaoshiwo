@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "钥匙窝 自动填充",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "配合钥匙窝密码管理器，在匹配网站自动填充账号密码，无需手动复制粘贴。",
   "permissions": ["storage", "activeTab"],
   "host_permissions": ["http://127.0.0.1/*", "http://localhost/*"],
