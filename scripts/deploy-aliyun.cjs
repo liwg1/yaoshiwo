@@ -344,7 +344,7 @@ async function deploy(conn) {
   for (const [label, cmd] of [
     ['nginx 状态', 'systemctl is-active nginx'],
     ['本机访问首页', 'curl -skL -o /dev/null -w "%{http_code}" -H "Host: ' + DOMAIN + '" https://127.0.0.1/'],
-    ['本机访问安装包', 'curl -skL -o /dev/null -w "%{http_code} %{content_type} %{size_download}" -H "Host: ' + DOMAIN + '" https://127.0.0.1/download/YaoShiWo-Setup-1.2.0.exe'],
+    ['本机访问安装包', `f=$(ls -1 ${WEB_ROOT}/download/YaoShiWo-Setup-*.exe 2>/dev/null | sort -V | tail -1); echo -n "$(basename "$f") "; curl -skIL -o /dev/null -w "%{http_code} %{content_type} %{size_download}" -H "Host: ${DOMAIN}" "https://127.0.0.1/download/$(basename "$f")"`],
     ['本机访问 sitemap', 'curl -skL -o /dev/null -w "%{http_code} %{content_type}" -H "Host: ' + DOMAIN + '" https://127.0.0.1/sitemap.xml'],
     ['站点文件数', `find ${WEB_ROOT} -type f | wc -l`],
     ['占用空间', `du -sh ${WEB_ROOT}`],
@@ -354,10 +354,8 @@ async function deploy(conn) {
     console.log(`  ${label}：${(r.out || r.err).trim()}`)
   }
   console.log('\n===== 部署完成 =====')
-  console.log('下一步（需要你在阿里云控制台做）：')
-  console.log('  1. 安全组放行 80/443（入方向，来源 0.0.0.0/0）')
-  console.log('  2. 域名 DNS 添加 A 记录：' + DOMAIN + ' → ' + HOST)
-  console.log('  3. 域名备案通过后（未备案时 80 端口会被阿里云拦截）再跑：node scripts/deploy-aliyun.cjs https')
+  console.log('日常：改了网站文件就重跑 node scripts/deploy-aliyun.cjs deploy；只改 nginx 模板用 conf。')
+  console.log('证书：' + DOMAIN + ' 与 www.' + DOMAIN + ' 共用一张证书，certbot 定时任务自动续期（certbot renew --dry-run 可演练）。')
 }
 
 async function netcheck(conn) {

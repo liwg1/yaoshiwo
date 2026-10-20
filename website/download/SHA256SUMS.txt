@@ -1,7 +1,6 @@
-# 钥匙窝 YaoShiWo v1.2.0 下载文件校验值
+# 钥匙窝 YaoShiWo v1.3.0 下载文件校验值
 # 用法：Windows 下 certutil -hashfile <文件名> SHA256  （或 PowerShell: Get-FileHash <文件名> -Algorithm SHA256）
 # 官网 https://www.yaoshiwo.cn   源码 https://github.com/liwg1/yaoshiwo
-
-2e93a17878aa6fdafbfa49e71a5bcd76df38da32ec30788b78c5990b14eb3255  YaoShiWo-Setup-1.2.0.exe  (84746207 字节)
-015a42510100bf0e3ef4f09fb99ef63c4873d9199e14ed41c53f4d2952f08ca9  YaoShiWo-portable.exe  (84538977 字节)
+4cc6b20d6890cfd6ab1a099d1b23aea9d0d876639903126434be2ec0128cbf82  YaoShiWo-Setup-1.3.0.exe  (84747314 字节)
+6f4986bd6340a78327f7d5a31e7cd8b18d7e9ffb9c39d2ddefbdb2d147af1ed5  YaoShiWo-portable.exe  (84540055 字节)
 d5e1b6e01a3a21d3ddf3c71aa0ce0bbfb630bc958bc4df102f9bda17dfc7b05a  YaoShiWo-chrome-extension.zip  (18364 字节)
