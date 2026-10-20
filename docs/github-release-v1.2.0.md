@@ -34,7 +34,7 @@ SafeVault 正式更名为 **钥匙窝 YaoShiWo**：换了个百度上独一无�
 | `YaoShiWo-portable.exe` | 免安装单文件版，可放 U 盘随身携带 | 约 81 MB |
 | `YaoShiWo-chrome-extension.zip` | 浏览器扩展（Chrome / Edge，解压后「加载已解压的扩展程序」） | 约 17 KB |
 
-官网下载：<https://yaoshiwo.cn/#download>
+官网下载：<https://www.yaoshiwo.cn/#download>
 
 ### SHA-256 校验值
 
