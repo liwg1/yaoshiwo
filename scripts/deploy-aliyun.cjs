@@ -136,12 +136,8 @@ async function uploadDir(conn, localDir, remoteDir) {
   return { files: done, bytes }
 }
 
-const NGINX_CONF = `# 钥匙窝 YaoShiWo 官网 —— 由 scripts/deploy-aliyun.cjs 生成
-server {
-    listen 80;
-    listen [::]:80;
-    server_name ${DOMAIN} www.${DOMAIN};
-
+// 站点公共部分（location / 缓存 / 安全头 / gzip），HTTP 与 HTTPS 两个版本共用
+const NGINX_COMMON = `
     root ${WEB_ROOT};
     index index.html;
 
@@ -182,12 +178,63 @@ server {
     gzip_comp_level 5;
     gzip_min_length 1024;
     gzip_types text/plain text/css application/javascript application/json application/xml image/svg+xml;
+`
 
+// 配置整份由本脚本生成，不再让 certbot 改这个文件：
+// certbot 改过的文件下次部署被覆盖 → HTTPS 静默失效；certbot 还会把 80 端口上的
+// 根域名写成 return 404（只给 www 放行跳转）。生成权归脚本，certbot 只负责发证书。
+function buildNginxConf(certDir) {
+  if (!certDir) {
+    return `# 钥匙窝 YaoShiWo 官网 —— 由 scripts/deploy-aliyun.cjs 生成（HTTP 版，证书尚未签发）
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN} www.${DOMAIN};
+${NGINX_COMMON}
     location / {
         try_files $uri $uri/ =404;
     }
 }
 `
+  }
+  return `# 钥匙窝 YaoShiWo 官网 —— 由 scripts/deploy-aliyun.cjs 生成（HTTPS 版，证书 ${certDir}）
+# 80 端口：两个域名一律 301 到 https（保留路径与查询串）
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN} www.${DOMAIN};
+
+    # 续期 / 扩签证书的验证文件必须能直接从 80 取到：
+    # 如果这里也 301 到 https，在证书还没覆盖根域名时 ACME 校验会跟着跳转然后失败。
+    location /.well-known/acme-challenge/ {
+        root ${WEB_ROOT};
+        default_type text/plain;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# 443 端口：真正提供服务
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name ${DOMAIN} www.${DOMAIN};
+${NGINX_COMMON}
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    ssl_certificate     ${certDir}/fullchain.pem;
+    ssl_certificate_key ${certDir}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+`
+}
+
 
 async function recon(conn) {
   console.log('===== 服务器侦察（不做任何修改）=====')
@@ -249,15 +296,30 @@ async function deploy(conn) {
   const { files, bytes } = await uploadDir(conn, LOCAL_SITE, WEB_ROOT)
   console.log(`  共 ${files} 个文件 / ${(bytes / 1048576).toFixed(1)} MB`)
 
+  // 机器上已有证书（之前跑过 https 子命令）→ 直接生成带 443 与跳转的版本，一步到位
+  const liveCerts = (await sh(conn, 'ls -1 /etc/letsencrypt/live/ 2>/dev/null || true')).out
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean)
+  const certName = [`www.${DOMAIN}`, DOMAIN].find((d) => liveCerts.includes(d)) || null
+  const certDir = certName ? `/etc/letsencrypt/live/${certName}` : null
+
   console.log('\n写入 nginx 配置 /etc/nginx/conf.d/' + DOMAIN + '.conf')
+  if (certDir) {
+    console.log(`  检测到证书 ${certName}，生成 HTTPS 版配置（80 → 443 跳转 + 443 服务）`)
+  } else {
+    console.log('  还没有证书，生成 HTTP 版配置（先跑 https 子命令能变成 HTTPS 版）')
+  }
   const sftp = await sftpOf(conn)
   const tmp = `/tmp/${DOMAIN}.conf`
   await new Promise((resolve, reject) =>
-    sftp.writeFile(tmp, NGINX_CONF, 'utf8', (e) => (e ? reject(e) : resolve()))
+    sftp.writeFile(tmp, buildNginxConf(certDir), 'utf8', (e) => (e ? reject(e) : resolve()))
   )
   sftp.end()
+  // 先备份上一版，出问题能回滚
+  await sh(conn, `test -f /etc/nginx/conf.d/${DOMAIN}.conf && cp /etc/nginx/conf.d/${DOMAIN}.conf /etc/nginx/conf.d/${DOMAIN}.conf.bak || true`)
   await sh(conn, `mv ${tmp} /etc/nginx/conf.d/${DOMAIN}.conf && chmod 644 /etc/nginx/conf.d/${DOMAIN}.conf`)
-  // 刻意不动服务器上已有的站点配置（这台机器上原本就有 portal.conf，删了会搞坏别人的站点）：
+  // 刻意不动服务器上已有的其它站点配置（这台机器上原本就有别人的站点，删了会搞坏别人的站）：
   // 我们的 server_name 只认 yaoshiwo.cn，不会和其它站点抢域名。
 
   const test = await sh(conn, 'nginx -t 2>&1')
@@ -275,9 +337,9 @@ async function deploy(conn) {
   console.log('\n—— 部署后自检 ——')
   for (const [label, cmd] of [
     ['nginx 状态', 'systemctl is-active nginx'],
-    ['本机访问首页', 'curl -s -o /dev/null -w "%{http_code}" -H "Host: ' + DOMAIN + '" http://127.0.0.1/'],
-    ['本机访问安装包', 'curl -s -o /dev/null -w "%{http_code} %{content_type} %{size_download}" -H "Host: ' + DOMAIN + '" http://127.0.0.1/download/YaoShiWo-Setup-1.2.0.exe'],
-    ['本机访问 sitemap', 'curl -s -o /dev/null -w "%{http_code} %{content_type}" -H "Host: ' + DOMAIN + '" http://127.0.0.1/sitemap.xml'],
+    ['本机访问首页', 'curl -skL -o /dev/null -w "%{http_code}" -H "Host: ' + DOMAIN + '" https://127.0.0.1/'],
+    ['本机访问安装包', 'curl -skL -o /dev/null -w "%{http_code} %{content_type} %{size_download}" -H "Host: ' + DOMAIN + '" https://127.0.0.1/download/YaoShiWo-Setup-1.2.0.exe'],
+    ['本机访问 sitemap', 'curl -skL -o /dev/null -w "%{http_code} %{content_type}" -H "Host: ' + DOMAIN + '" https://127.0.0.1/sitemap.xml'],
     ['站点文件数', `find ${WEB_ROOT} -type f | wc -l`],
     ['占用空间', `du -sh ${WEB_ROOT}`],
     ['防火墙', '(ufw status 2>/dev/null | head -1) || (firewall-cmd --state 2>/dev/null) || echo "无 ufw/firewalld"']
@@ -344,21 +406,51 @@ async function https(conn) {
 
   const email = process.env.SAFEVAULT_ACME_EMAIL
   const mailArg = email ? `-m ${email}` : '--register-unsafely-without-email'
-  console.log('申请证书并自动改 nginx 配置（含 80 → 443 跳转）…')
+  // 用 certonly --webroot：certbot 只负责发证书，nginx 配置由本脚本生成。
+  // 好处是根域名和 www 都能一次签进同一张证书（certbot --nginx 会改我们的配置文件，
+  // 而且会把 80 上的根域名写成 return 404），也不会和下次部署打架。
+  console.log('申请证书（webroot 方式，不改 nginx 配置）…')
   const r = await sh(
     conn,
-    `certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --non-interactive --agree-tos ${mailArg} --redirect 2>&1 | tail -25`,
+    `certbot certonly --webroot -w ${WEB_ROOT} -d ${DOMAIN} -d www.${DOMAIN} --expand --non-interactive --agree-tos ${mailArg} 2>&1 | tail -25`,
     { timeout: 300000 }
   )
   console.log(r.out.trim())
 
+  // 拿到证书后由脚本自己写 HTTPS 配置（80 全部跳转 + 443 提供服务，两个域名都算数）
+  const liveCerts2 = (await sh(conn, 'ls -1 /etc/letsencrypt/live/ 2>/dev/null || true')).out
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean)
+  const certName2 = [`www.${DOMAIN}`, DOMAIN].find((d) => liveCerts2.includes(d))
+  if (!certName2) throw new Error(`证书没有签下来（/etc/letsencrypt/live 里没有 ${DOMAIN} 或 www.${DOMAIN}）`)
+  const certDir2 = `/etc/letsencrypt/live/${certName2}`
+
+  console.log(`\n写入 HTTPS 版 nginx 配置（证书 ${certName2}）…`)
+  const sftp2 = await sftpOf(conn)
+  const tmp2 = `/tmp/${DOMAIN}.conf`
+  await new Promise((resolve, reject) =>
+    sftp2.writeFile(tmp2, buildNginxConf(certDir2), 'utf8', (e) => (e ? reject(e) : resolve()))
+  )
+  sftp2.end()
+  await sh(conn, `test -f /etc/nginx/conf.d/${DOMAIN}.conf && cp /etc/nginx/conf.d/${DOMAIN}.conf /etc/nginx/conf.d/${DOMAIN}.conf.bak || true`)
+  await sh(conn, `mv ${tmp2} /etc/nginx/conf.d/${DOMAIN}.conf && chmod 644 /etc/nginx/conf.d/${DOMAIN}.conf`)
+  const t2 = await sh(conn, 'nginx -t 2>&1')
+  console.log(t2.out.trim())
+  if (t2.code !== 0) throw new Error('nginx 配置检查未通过（旧配置在 ' + DOMAIN + '.conf.bak）')
+  const rl2 = await sh(conn, 'nginx -s reload 2>&1 || systemctl reload nginx 2>&1')
+  console.log('重载结果：' + (rl2.out.trim() || 'ok'))
+
   console.log('\n—— 复核 ——')
   for (const [label, cmd] of [
-    ['证书文件', `ls -1 /etc/letsencrypt/live/${DOMAIN}/ 2>/dev/null || echo "没有证书"`],
-    ['证书有效期', `openssl x509 -enddate -noout -in /etc/letsencrypt/live/${DOMAIN}/fullchain.pem 2>/dev/null || true`],
+    ['证书文件', `ls -1 ${certDir2}/ | tr '\\n' ' '`],
+    ['证书覆盖的域名', `openssl x509 -in ${certDir2}/fullchain.pem -noout -text 2>/dev/null | grep -A1 "Subject Alternative Name" | tail -1`],
+    ['证书有效期', `openssl x509 -enddate -noout -in ${certDir2}/fullchain.pem 2>/dev/null || true`],
     ['自动续期定时任务', 'systemctl list-timers 2>/dev/null | grep -i certbot || ls -l /etc/cron.d/certbot* 2>/dev/null || echo "（检查 certbot renew 是否已配）"'],
-    ['本机 https 测试', `curl -sk -o /dev/null -w "HTTP %{http_code}" --max-time 8 https://127.0.0.1/ -H "Host: ${DOMAIN}"`],
-    ['http 是否跳转', `curl -s -o /dev/null -w "HTTP %{http_code} → %{redirect_url}" --max-time 8 -H "Host: ${DOMAIN}" http://127.0.0.1/`]
+    ['本机 https（www）', `curl -sk -o /dev/null -w "HTTP %{http_code}" --max-time 8 https://127.0.0.1/ -H "Host: www.${DOMAIN}"`],
+    ['本机 https（根域名）', `curl -sk -o /dev/null -w "HTTP %{http_code}" --max-time 8 https://127.0.0.1/ -H "Host: ${DOMAIN}"`],
+    ['本机 http（www 跳转）', `curl -s -o /dev/null -w "HTTP %{http_code} → %{redirect_url}" --max-time 8 -H "Host: www.${DOMAIN}" http://127.0.0.1/`],
+    ['本机 http（根域名跳转）', `curl -s -o /dev/null -w "HTTP %{http_code} → %{redirect_url}" --max-time 8 -H "Host: ${DOMAIN}" http://127.0.0.1/`]
   ]) {
     const rr = await sh(conn, cmd)
     console.log(`  ${label}：${(rr.out || rr.err).trim()}`)
@@ -385,6 +477,45 @@ async function status(conn) {
   }
 }
 
+// 只重写 nginx 配置（不上传网站文件）：改了 nginx 模板或刚签完证书时用
+async function conf(conn) {
+  console.log('===== 重写 nginx 配置（不动网站文件）=====')
+  const liveCerts = (await sh(conn, 'ls -1 /etc/letsencrypt/live/ 2>/dev/null || true')).out
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean)
+  const certName = [`www.${DOMAIN}`, DOMAIN].find((d) => liveCerts.includes(d)) || null
+  const certDir = certName ? `/etc/letsencrypt/live/${certName}` : null
+  console.log(certDir ? `检测到证书 ${certName} → 生成 HTTPS 版配置` : '没有证书 → 生成 HTTP 版配置')
+
+  const sftp = await sftpOf(conn)
+  const tmp = `/tmp/${DOMAIN}.conf`
+  await new Promise((resolve, reject) =>
+    sftp.writeFile(tmp, buildNginxConf(certDir), 'utf8', (e) => (e ? reject(e) : resolve()))
+  )
+  sftp.end()
+  await sh(conn, `test -f /etc/nginx/conf.d/${DOMAIN}.conf && cp /etc/nginx/conf.d/${DOMAIN}.conf /etc/nginx/conf.d/${DOMAIN}.conf.bak || true`)
+  await sh(conn, `mv ${tmp} /etc/nginx/conf.d/${DOMAIN}.conf && chmod 644 /etc/nginx/conf.d/${DOMAIN}.conf`)
+
+  const t = await sh(conn, 'nginx -t 2>&1')
+  console.log(t.out.trim())
+  if (t.code !== 0) throw new Error(`nginx 配置检查未通过（旧配置已备份为 ${DOMAIN}.conf.bak）`)
+  const r = await sh(conn, 'nginx -s reload 2>&1 || systemctl reload nginx 2>&1')
+  console.log('重载：' + (r.out.trim() || 'ok'))
+
+  console.log('\n—— 生效检查 ——')
+  for (const [label, cmd] of [
+    ['www http', `curl -s -o /dev/null -w "HTTP %{http_code} → %{redirect_url}" --max-time 6 -H "Host: www.${DOMAIN}" http://127.0.0.1/`],
+    ['根域名 http', `curl -s -o /dev/null -w "HTTP %{http_code} → %{redirect_url}" --max-time 6 -H "Host: ${DOMAIN}" http://127.0.0.1/`],
+    ['www https', `curl -sk -o /dev/null -w "HTTP %{http_code}｜%{size_download} 字节" --max-time 6 -H "Host: www.${DOMAIN}" https://127.0.0.1/`],
+    ['根域名 https', `curl -sk -o /dev/null -w "HTTP %{http_code}｜%{size_download} 字节" --max-time 6 -H "Host: ${DOMAIN}" https://127.0.0.1/`],
+    ['acme 验证通道（80）', `curl -s -o /dev/null -w "HTTP %{http_code}" --max-time 6 -H "Host: www.${DOMAIN}" http://127.0.0.1/.well-known/acme-challenge/preflight.txt`]
+  ]) {
+    const rr = await sh(conn, cmd)
+    console.log(`  ${label}：${(rr.out || rr.err).trim()}`)
+  }
+}
+
 ;(async () => {
   let conn
   try {
@@ -393,11 +524,12 @@ async function status(conn) {
     console.log('已登录服务器\n')
     if (mode === 'recon') await recon(conn)
     else if (mode === 'deploy') await deploy(conn)
+    else if (mode === 'conf') await conf(conn)
     else if (mode === 'netcheck') await netcheck(conn)
     else if (mode === 'https') await https(conn)
     else if (mode === 'status') await status(conn)
     else {
-      console.error('未知模式：' + mode + '（可用：recon / deploy / netcheck / https / status）')
+      console.error('未知模式：' + mode + '（可用：recon / deploy / conf / netcheck / https / status）')
       process.exitCode = 2
     }
   } catch (e) {

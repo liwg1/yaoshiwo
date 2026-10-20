@@ -31,6 +31,8 @@ extension.json
 website/preview/
 website/download/*.exe
 website/download/*.zip
+# 官网下载区那份「已解压的扩展」是 make-extension-zip.mjs 生成出来的副本，源在 chrome-extension/
+website/download/YaoShiWo-chrome-extension/
 
 # ===== 编辑器 / 系统垃圾 =====
 .vscode/
