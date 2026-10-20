@@ -340,6 +340,12 @@ function registerIpc(): void {
 
   // ---- 浏览器扩展相关 ----
   ipcMain.handle('extension:getConfig', () => getExtensionConfig())
+  // 设置面板里「下载扩展包」按钮：只放行 https 链接，避免被当作任意命令执行入口
+  ipcMain.handle('shell:openExternal', (_e, url: unknown) => {
+    if (typeof url !== 'string' || !/^https:\/\//i.test(url)) return false
+    void shell.openExternal(url)
+    return true
+  })
   ipcMain.handle('extension:setEnabled', (_e, value: boolean) => {
     setExtensionEnabled(value)
     return getExtensionConfig()

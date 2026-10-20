@@ -48,14 +48,14 @@
   "applicationCategory": "SecurityApplication",
   "applicationSubCategory": "密码管理器",
   "operatingSystem": "Windows 10, Windows 11 (64 位)",
-  "softwareVersion": "1.2.0",
+  "softwareVersion": "1.3.0",
   "fileSize": "80MB",
   "inLanguage": "zh-CN",
   "isAccessibleForFree": true,
   "description": "钥匙窝是一款把数据完全存放在本机的 Windows 密码管理器：AES-256 整库加密、Argon2 密钥派生、KeePass 标准 KDBX 4 格式，支持浏览器自动填充、拼音模糊搜索与动态口令。不上传云端、不需要注册、断网可用。",
   "url": "https://www.yaoshiwo.cn/",
-  "downloadUrl": "https://www.yaoshiwo.cn/download/YaoShiWo-Setup-1.2.0.exe",
-  "installUrl": "https://www.yaoshiwo.cn/download/YaoShiWo-Setup-1.2.0.exe",
+  "downloadUrl": "https://www.yaoshiwo.cn/download/YaoShiWo-Setup-1.3.0.exe",
+  "installUrl": "https://www.yaoshiwo.cn/download/YaoShiWo-Setup-1.3.0.exe",
   "softwareHelp": "https://www.yaoshiwo.cn/#faq",
   "image": "https://www.yaoshiwo.cn/assets/img/og-cover.png",
   "screenshot": "https://www.yaoshiwo.cn/assets/img/og-cover.png",
@@ -138,7 +138,7 @@
         </svg>
       </span>
       <span class="nav-name">钥匙窝<span class="nav-sub">密码管理器</span></span>
-      <span class="nav-ver">v1.2.0</span>
+      <span class="nav-ver">v1.3.0</span>
     </a>
     <nav class="nav-links" id="navLinks">
       <a href="#features">功能</a>
@@ -146,6 +146,7 @@
       <a href="#extension">浏览器扩展</a>
       <a href="#compare">为什么本地</a>
       <a href="#faq">常见问题</a>
+      <a href="https://github.com/liwg1/yaoshiwo" target="_blank" rel="noopener noreferrer">GitHub</a>
     </nav>
     <div class="nav-actions">
       <a class="btn btn-primary btn-sm" href="#download">
@@ -172,7 +173,7 @@
     <div class="hero-copy">
       <div class="badge reveal">
         <span class="badge-dot"></span>
-        v1.2.0 已发布 · 正式定名「钥匙窝」，日常更顺手
+        v1.3.0 已发布 · 扩展安装四步走，源码已开源
       </div>
       <h1 class="reveal">
         你的密码，<br />
@@ -412,16 +413,21 @@
       <div class="ext-steps">
         <div class="step reveal">
           <span class="step-no">1</span>
-          <div><h3>在设置里开启扩展服务</h3><p>打开钥匙窝 → 设置 → 浏览器扩展，一键启用并解锁数据库。服务只监听本机回环地址。</p></div>
+          <div><h3>开启扩展服务</h3><p>打开钥匙窝 → 设置 → 浏览器扩展（自动填充），把开关打开，并<b>解锁数据库</b>。服务只监听本机回环地址，外网连不进来。</p></div>
         </div>
         <div class="step reveal">
           <span class="step-no">2</span>
-          <div><h3>加载扩展</h3><p>下载扩展包（<a href="download/YaoShiWo-chrome-extension.zip">.zip</a>，当前 v1.2.1）解压到任意目录；Chrome 地址栏进入 <code>chrome://extensions</code>，打开开发者模式，选择「加载已解压的扩展程序」，指向解压出来的文件夹。</p></div>
+          <div><h3>下载扩展包并解压</h3><p>下载 <a href="download/YaoShiWo-chrome-extension.zip">YaoShiWo-chrome-extension.zip</a>（当前 v1.2.1），解压到一个<b>固定目录</b>。解压出来的文件夹不要删、不要挪——浏览器是按这个路径直接加载的。</p></div>
         </div>
         <div class="step reveal">
           <span class="step-no">3</span>
-          <div><h3>开始自动填充</h3><p>打开任意登录页，输入框旁的小图标就是它。新注册的账号，扩展会问你要不要顺手存进保险库。</p></div>
+          <div><h3>加载到浏览器</h3><p>Chrome 地址栏输入 <code>chrome://extensions</code>（Edge 输入 <code>edge://extensions</code>）→ 打开右上角「开发者模式」→ 点「加载已解压的扩展程序」→ 选中第 2 步解压出来的文件夹（里面能看到 <code>manifest.json</code>）。</p></div>
         </div>
+        <div class="step reveal">
+          <span class="step-no">4</span>
+          <div><h3>粘贴令牌配对</h3><p>回到钥匙窝设置页复制「访问令牌」，点浏览器工具栏上的钥匙窝图标，把令牌粘进输入框、端口保持默认、保存。弹窗显示「已连接」即完成。</p></div>
+        </div>
+        <p class="ext-note reveal">还连不上就按顺序排查：① 钥匙窝开着没有、有没有解锁（锁定状态下扩展一个密码也取不到）；② 扩展里填的端口和设置页显示的是否一致；③ 是否点过「重新生成令牌」（生成后要在扩展里重新粘贴一次）；④ 换了 Chrome 用户或重装浏览器，第 3、4 步要重做。</p>
       </div>
 
       <div class="ext-visual reveal">
@@ -494,11 +500,25 @@
   <div class="container">
     <div class="section-head reveal">
       <span class="kicker">CHANGELOG</span>
-      <h2>v1.2.0：<span class="grad">改名「钥匙窝」，外加 4 处改动</span></h2>
-      <p>软件正式定名 <b>钥匙窝</b>（英文 YaoShiWo）。功能和数据一律照旧：你的 .kdbx 文件、设置、浏览器扩展配对都不受影响。</p>
+      <h2>v1.3.0：<span class="grad">扩展安装讲明白了，源码也开源了</span></h2>
+      <p>先看 v1.3.0 的两处改动；往下的编号条目来自 v1.2.0 那次改名，一起列在这里。</p>
     </div>
 
     <div class="log">
+      <article class="log-item reveal">
+        <span class="log-tag">NEW</span>
+        <div>
+          <h3>浏览器扩展：四步装完，还带排障</h3>
+          <p>设置里直接点「下载扩展包」，然后四步走：下载并解压 → 打开 <code>chrome://extensions</code> 开开发者模式 → 加载已解压的扩展程序 → 粘贴访问令牌配对。官网同一套步骤，末尾还补了锁定状态取不到凭证、重生成令牌要重新粘贴这类常见坑。</p>
+        </div>
+      </article>
+      <article class="log-item reveal">
+        <span class="log-tag">NEW</span>
+        <div>
+          <h3>源码上了 GitHub</h3>
+          <p>导航与页脚都加了「源码在 GitHub」入口，<a href="https://github.com/liwg1/yaoshiwo" target="_blank" rel="noopener noreferrer">liwg1/yaoshiwo</a> 采用 MIT 许可。你可以自己审代码、自己编译，也可以提 issue 说哪儿别扭。</p>
+        </div>
+      </article>
       <article class="log-item reveal">
         <span class="log-tag">00</span>
         <div>
@@ -586,11 +606,11 @@
     </div>
 
     <div class="dl-grid">
-      <a class="dl-card reveal" href="download/YaoShiWo-Setup-1.2.0.exe">
+      <a class="dl-card reveal" href="download/YaoShiWo-Setup-1.3.0.exe">
         <span class="dl-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <h3>安装版</h3>
         <p>推荐。带开始菜单与桌面快捷方式，可正常卸载。</p>
-        <span class="dl-meta">YaoShiWo-Setup-1.2.0.exe · 约 81 MB</span>
+        <span class="dl-meta">YaoShiWo-Setup-1.3.0.exe · 约 81 MB</span>
         <span class="dl-btn">下载安装包</span>
       </a>
       <a class="dl-card reveal" href="download/YaoShiWo-portable.exe">
@@ -610,7 +630,7 @@
     </div>
 
     <p class="dl-note reveal">安装前建议先完全退出正在运行的钥匙窝（托盘图标右键 → 退出），避免文件被占用。</p>
-    <p class="dl-note reveal">不放心文件来路？下载后可以核对 SHA-256 校验值：<a href="download/SHA256SUMS.txt">SHA256SUMS.txt</a>（Windows 下执行 <code>certutil -hashfile YaoShiWo-Setup-1.2.0.exe SHA256</code> 比对即可）。</p>
+    <p class="dl-note reveal">不放心文件来路？下载后可以核对 SHA-256 校验值：<a href="download/SHA256SUMS.txt">SHA256SUMS.txt</a>（Windows 下执行 <code>certutil -hashfile YaoShiWo-Setup-1.3.0.exe SHA256</code> 比对即可）。</p>
   </div>
 </section>
 
@@ -637,6 +657,7 @@
       <a href="#extension">浏览器扩展</a>
       <a href="#changelog">更新日志</a>
       <a href="#download">下载</a>
+      <a href="https://github.com/liwg1/yaoshiwo" target="_blank" rel="noopener noreferrer">源码在 GitHub</a>
     </nav>
     <p class="footer-copy">© 2026 钥匙窝 YaoShiWo · 本地优先的密码管理方案</p>
     <p class="footer-icp">

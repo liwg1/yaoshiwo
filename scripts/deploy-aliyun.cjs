@@ -212,7 +212,7 @@ server {
     }
 
     location / {
-        return 301 https://$host$request_uri;
+        return 301 https://www.${DOMAIN}$request_uri;
     }
 }
 
@@ -222,6 +222,12 @@ server {
     listen [::]:443 ssl;
     http2 on;
     server_name ${DOMAIN} www.${DOMAIN};
+
+    # 根域名统一跳到 www：canonical / sitemap / 公众号里写的都是 www，同一份内容不留两个地址
+    if ($host = ${DOMAIN}) {
+        return 301 https://www.${DOMAIN}$request_uri;
+    }
+
 ${NGINX_COMMON}
     location / {
         try_files $uri $uri/ =404;

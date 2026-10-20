@@ -1,11 +1,11 @@
 {
   "name": "safevault",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "钥匙窝（YaoShiWo）：安全、现代、本地的密码管理器",
   "main": "./out/main/index.js",
   "author": "钥匙窝 YaoShiWo",
   "license": "MIT",
-  "homepage": "https://yaoshiwo.cn",
+  "homepage": "https://www.yaoshiwo.cn",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/liwg1/yaoshiwo.git"

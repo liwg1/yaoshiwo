@@ -10,6 +10,7 @@ const api = {
   clipboardWrite: (text: string, clearMs: number) =>
     ipcRenderer.invoke('clipboard:write', text, clearMs),
   clipboardClear: () => ipcRenderer.invoke('clipboard:clear'),
+  openExternal: (url: string) => ipcRenderer.invoke('shell:openExternal', url),
   getRecent: () => ipcRenderer.invoke('app:getRecent'),
   addRecent: (path: string) => ipcRenderer.invoke('app:addRecent', path),
   removeRecent: (path: string) => ipcRenderer.invoke('app:removeRecent', path),

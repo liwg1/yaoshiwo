@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Sun, Moon, Monitor, Copy, Check, RefreshCw, Eye, EyeOff, Puzzle } from 'lucide-react'
+import { Sun, Moon, Monitor, Copy, Check, RefreshCw, Eye, EyeOff, Puzzle, Download } from 'lucide-react'
 import Modal from './ui/Modal'
 import { useVault } from '../store/vault'
 
@@ -226,6 +226,10 @@ function ExtensionSection(): JSX.Element {
     setTimeout(() => setCopied(false), 1500)
   }
 
+  async function openDownload(): Promise<void> {
+    await window.api.openExternal('https://www.yaoshiwo.cn/download/YaoShiWo-chrome-extension.zip')
+  }
+
   return (
     <section>
       <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-1.5">
@@ -287,10 +291,43 @@ function ExtensionSection(): JSX.Element {
             </div>
           </div>
 
+          <div className="rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-200">装到浏览器：四步</span>
+              <button
+                onClick={() => void openDownload()}
+                className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+              >
+                <Download size={12} />
+                下载扩展包
+              </button>
+            </div>
+            <ol className="space-y-1.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 list-none">
+              <li>
+                <b className="text-slate-700 dark:text-slate-300">① 下载并解压</b>：点上面「下载扩展包」得到{' '}
+                <span className="font-mono">YaoShiWo-chrome-extension.zip</span>，解压到一个固定目录。
+                解压后这个文件夹不要删、不要挪——浏览器是直接按这个路径加载的。
+              </li>
+              <li>
+                <b className="text-slate-700 dark:text-slate-300">② 打开扩展管理页</b>：Chrome 地址栏输入{' '}
+                <span className="font-mono">chrome://extensions</span>（Edge 输入 <span className="font-mono">edge://extensions</span>），
+                把右上角的「开发者模式」开关打开。
+              </li>
+              <li>
+                <b className="text-slate-700 dark:text-slate-300">③ 加载</b>：点「加载已解压的扩展程序」，
+                选第 ① 步解压出来的文件夹（里面能看到 <span className="font-mono">manifest.json</span>）。
+              </li>
+              <li>
+                <b className="text-slate-700 dark:text-slate-300">④ 配对</b>：点浏览器工具栏上的钥匙窝图标，
+                把上面的访问令牌粘进输入框、点保存；端口保持 <span className="font-mono">{config.port}</span> 即可。
+              </li>
+            </ol>
+          </div>
+
           <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed">
-            在 Chrome 打开 <span className="font-mono">chrome://extensions</span> → 开启「开发者模式」→「加载已解压的扩展程序」，
-            选择 钥匙窝 目录下的 <span className="font-mono">chrome-extension</span> 文件夹；再把上面的令牌粘贴到扩展弹窗完成配对。
-            密码库锁定时扩展无法获取任何凭证。
+            装好后：登录页的账号与密码框旁会出现一个小盾牌图标，点一下即可填充。
+            <b className="text-slate-500 dark:text-slate-400">密码库锁定时扩展取不到任何凭证</b>；重新生成令牌后，要在扩展弹窗里重新粘贴一次。
+            换 Chrome 用户、重装浏览器、或把解压目录挪走之后，第 ②③ 步要重做一遍。
           </p>
         </div>
       )}

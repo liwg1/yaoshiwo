@@ -417,6 +417,11 @@ kbd {
 }
 .step h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
 .step p { font-size: 14.5px; color: var(--text-2); }
+.ext-note {
+  font-size: 13px; line-height: 1.8; color: var(--text-2);
+  padding: 14px 18px; border-radius: var(--radius);
+  border: 1px dashed var(--line); background: rgba(148, 163, 184, 0.03);
+}
 
 .browser {
   position: relative; border-radius: 14px; overflow: hidden;

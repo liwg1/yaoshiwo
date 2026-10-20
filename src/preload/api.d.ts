@@ -19,6 +19,7 @@ export interface SafeVaultApi {
   fetchFavicon: (domain: string) => Promise<{ data: string | null }>
   clipboardWrite: (text: string, clearMs: number) => Promise<boolean>
   clipboardClear: () => Promise<boolean>
+  openExternal: (url: string) => Promise<boolean>
   getRecent: () => Promise<string[]>
   addRecent: (path: string) => Promise<string[]>
   removeRecent: (path: string) => Promise<string[]>

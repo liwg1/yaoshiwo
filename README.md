@@ -2,7 +2,11 @@
 
 > 本地优先、不上传云端的 Windows 密码管理器 · 直接读写 KeePass 2 的 `.kdbx` 文件
 
-[官网](https://www.yaoshiwo.cn) · [下载最新版](https://www.yaoshiwo.cn/#download) · [更新日志](CHANGELOG.md) · [MIT 协议](LICENSE)
+[![构建状态](https://github.com/liwg1/yaoshiwo/actions/workflows/build.yml/badge.svg)](https://github.com/liwg1/yaoshiwo/actions/workflows/build.yml)
+[![最新版本](https://img.shields.io/github/v/release/liwg1/yaoshiwo?label=release)](https://github.com/liwg1/yaoshiwo/releases/latest)
+[![许可](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+[官网](https://www.yaoshiwo.cn) · [下载最新版](https://github.com/liwg1/yaoshiwo/releases/latest) · [更新日志](CHANGELOG.md) · [MIT 协议](LICENSE)
 
 ---
 
@@ -63,7 +67,14 @@
 
 系统要求：Windows 10 / 11（64 位）。
 
-**浏览器扩展安装**：解压 zip → 打开 `chrome://extensions` → 打开右上角「开发者模式」→「加载已解压的扩展程序」→ 选中解压出来的目录 → 回到钥匙窝「设置 → 浏览器扩展」启用服务（首次启用会显示令牌，扩展会自动读取）。
+**浏览器扩展安装（四步）**
+
+1. 下载 `YaoShiWo-chrome-extension.zip`，解压到一个固定目录。**解压后的文件夹不要删、不要挪**——浏览器是按这个路径直接加载的。
+2. Chrome 地址栏输入 `chrome://extensions`（Edge 输入 `edge://extensions`），打开右上角「开发者模式」，点「加载已解压的扩展程序」，选中第 1 步解压出来的文件夹（里面能看到 `manifest.json`）。
+3. 回到钥匙窝「设置 → 浏览器扩展」，打开开关并解锁数据库，复制页面上显示的「访问令牌」。
+4. 点浏览器工具栏上的钥匙窝图标，把令牌粘进输入框、端口保持默认、保存；弹窗显示「已连接」即完成。
+
+连不上时的排查顺序：钥匙窝是否开着且已解锁（锁定状态下扩展取不到任何凭证）→ 扩展里的端口是否与设置页一致 → 是否点过「重新生成令牌」（点过就要重新粘贴）→ 换 Chrome 用户或重装浏览器后第 2、4 步要重做。
 
 ## 安全模型
 
