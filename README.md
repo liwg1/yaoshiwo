@@ -2,7 +2,7 @@
 
 > 本地优先、不上传云端的 Windows 密码管理器 · 直接读写 KeePass 2 的 `.kdbx` 文件
 
-[官网](https://yaoshiwo.cn) · [下载最新版](https://yaoshiwo.cn/#download) · [更新日志](CHANGELOG.md) · [MIT 协议](LICENSE)
+[官网](https://www.yaoshiwo.cn) · [下载最新版](https://www.yaoshiwo.cn/#download) · [更新日志](CHANGELOG.md) · [MIT 协议](LICENSE)
 
 ---
 
@@ -52,7 +52,7 @@
 
 ## 下载和安装
 
-- 官网：<https://yaoshiwo.cn>
+- 官网：<https://www.yaoshiwo.cn>
 - GitHub Releases：<https://github.com/liwg1/yaoshiwo/releases>
 
 | 文件 | 说明 |
