@@ -136,6 +136,20 @@ async function uploadDir(conn, localDir, remoteDir) {
   return { files: done, bytes }
 }
 
+// 安全响应头。nginx 的 add_header 是「上一层有写就不再继承上一层」，所以每个自己写了
+// add_header 的 location 都必须把这组头再写一遍，否则 /assets/ /download/ 会静默丢掉 CSP 与 HSTS。
+// HSTS 只在 HTTPS 下有意义，经明文收到时浏览器按 RFC 6797 会忽略，所以两版共用一份没问题。
+const SECURITY_HEADERS = `    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # 官网用不到摄像头/麦克风/定位/支付，直接禁掉，减少被第三方脚本滥用的面
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()" always;
+    # 让浏览器记住「这个域名只走 HTTPS」，有效期半年。
+    # 刻意不加 includeSubDomains：以后若再加只走 HTTP 的子域名，不至于被一起锁死。
+    add_header Strict-Transport-Security "max-age=15552000" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" always;
+`
+
 // 站点公共部分（location / 缓存 / 安全头 / gzip），HTTP 与 HTTPS 两个版本共用
 const NGINX_COMMON = `
     root ${WEB_ROOT};
@@ -146,25 +160,21 @@ const NGINX_COMMON = `
     error_log  /var/log/nginx/${DOMAIN}.error.log;
 
     # 安全响应头（meta 里放 frame-ancestors 无效，只能在这里给）
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'" always;
-
+${SECURITY_HEADERS}
     location = /index.html {
-        add_header Cache-Control "no-cache";
+${SECURITY_HEADERS}        add_header Cache-Control "no-cache";
     }
 
     # 静态资源长缓存
     location /assets/ {
-        expires 30d;
+${SECURITY_HEADERS}        expires 30d;
         add_header Cache-Control "public";
         try_files $uri =404;
     }
 
     # 安装包 / 扩展压缩包：必须走下载而不是在浏览器里打开
     location /download/ {
-        types { }
+${SECURITY_HEADERS}        types { }
         default_type application/octet-stream;
         add_header Content-Disposition "attachment";
         try_files $uri =404;
