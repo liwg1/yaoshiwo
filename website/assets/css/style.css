@@ -576,7 +576,11 @@ details[open] .chev { transform: rotate(-135deg); border-color: var(--cyan); }
 .footer-links { display: flex; flex-wrap: wrap; gap: 22px; margin-left: auto; }
 .footer-links a { font-size: 14px; color: var(--text-3); transition: color 0.2s ease; }
 .footer-links a:hover { color: var(--cyan-2); }
-.footer-copy { width: 100%; font-size: 12.5px; color: var(--text-3); padding-top: 18px; border-top: 1px solid var(--line); }
+.footer-copy { width: 100%; font-size: 12.5px; color: var(--text-3); padding-top: 18px; border-top: 1px solid var(--line); text-align: center; }
+/* 工信部要求：备案号放在首页底部中间位置，并链接到 beian.miit.gov.cn */
+.footer-icp { width: 100%; text-align: center; font-size: 12.5px; color: var(--text-3); padding-top: 8px; }
+.footer-icp a { color: var(--text-3); text-decoration: none; border-bottom: 1px dotted var(--line); transition: color 0.2s ease, border-color 0.2s ease; }
+.footer-icp a:hover { color: var(--cyan-2); border-bottom-color: var(--cyan-2); }
 
 /* ---------------- 滚动出现动画 ---------------- */
 .reveal { opacity: 0; transform: translateY(22px); }

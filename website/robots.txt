@@ -6,4 +6,4 @@ Disallow: /preview/
 Disallow: /download/
 
 # 三个搜索引擎都支持 sitemap 声明
-Sitemap: https://yaoshiwo.cn/sitemap.xml
+Sitemap: https://www.yaoshiwo.cn/sitemap.xml
