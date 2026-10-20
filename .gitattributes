@@ -1,0 +1,20 @@
+# 仓库里统一存 LF，避免 Windows 上 commit 时反复出现 LF→CRLF 警告
+* text=auto eol=lf
+
+# 二进制：不做任何换行转换
+*.exe binary
+*.dll binary
+*.node binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.7z binary
+*.kdbx binary
+*.woff binary
+*.woff2 binary
+
+# 打包产物与锁文件：GitHub 上默认折叠，也避免 diff 噪音
+package-lock.json -diff
