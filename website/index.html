@@ -35,7 +35,7 @@
 <meta name="twitter:image" content="https://www.yaoshiwo.cn/assets/img/og-cover.png" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'" />
 <link rel="icon" href="assets/img/logo.svg" />
-<link rel="stylesheet" href="assets/css/style.css" />
+<link rel="stylesheet" href="assets/css/style.css?v=20261020b" />
 <noscript><style>.reveal{opacity:1 !important;transform:none !important}</style></noscript>
 
 <!-- 结构化数据：让搜索引擎知道这是一款什么软件 -->
@@ -145,8 +145,12 @@
       <a href="#security">安全</a>
       <a href="#extension">浏览器扩展</a>
       <a href="#compare">为什么本地</a>
+      <a href="#opensource">开源</a>
       <a href="#faq">常见问题</a>
-      <a href="https://github.com/liwg1/yaoshiwo" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a class="nav-gh" href="https://github.com/liwg1/yaoshiwo" target="_blank" rel="noopener noreferrer" title="源码在 GitHub">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
     </nav>
     <div class="nav-actions">
       <a class="btn btn-primary btn-sm" href="#download">
@@ -558,8 +562,86 @@
   </div>
 </section>
 
+<!-- ============ 开源 ============ -->
+<section class="section section-alt" id="opensource">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">OPEN SOURCE</span>
+      <h2>源码搬上了 GitHub，<span class="grad">随时可以自己审一遍</span></h2>
+      <p>一个密码管理器说「我不上传你的数据」，光靠官方拍胸脯没意义。代码摆在那儿：自己看、自己编译、自己核对它到底连不连外网。</p>
+    </div>
+
+    <div class="repo-card reveal">
+      <div class="repo-main">
+        <div class="repo-head">
+          <span class="repo-mark">
+            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          </span>
+          <div class="repo-name">
+            <b>liwg1 / yaoshiwo</b>
+            <span>Public repository · MIT License</span>
+          </div>
+        </div>
+
+        <p class="repo-desc">
+          钥匙窝 YaoShiWo —— 本地优先的 Windows 密码管理器。Electron + React + TypeScript，
+          密码库走 KeePass 2 标准的 KDBX 4，构建、部署、校验脚本一并公开。
+        </p>
+
+        <div class="repo-chips">
+          <span>TypeScript</span>
+          <span>Electron</span>
+          <span>React</span>
+          <span>KDBX 4</span>
+          <span class="chip-ok">MIT</span>
+        </div>
+
+        <div class="repo-actions">
+          <a class="btn btn-primary" href="https://github.com/liwg1/yaoshiwo" target="_blank" rel="noopener noreferrer">
+            去 GitHub 看源码
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/liwg1/yaoshiwo/stargazers" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5l2.6 5.5 5.9.8-4.3 4.2 1.1 5.9L12 17l-5.3 2.9 1.1-5.9L3.5 9.8l5.9-.8L12 3.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            Star 支持一下
+          </a>
+        </div>
+      </div>
+
+      <div class="repo-side">
+        <div class="term">
+          <div class="term-bar">
+            <i></i><i></i><i></i><span>bash · build from source</span>
+          </div>
+          <pre class="term-body"><code><span class="c"># 克隆下来，跑起来看看</span>
+<span class="p">$</span> git clone https://github.com/liwg1/yaoshiwo.git
+<span class="p">$</span> cd yaoshiwo &amp;&amp; npm install
+<span class="p">$</span> npm run dev    <span class="c"># 开发模式</span>
+<span class="p">$</span> npm run build  <span class="c"># 打 Windows 包</span></code></pre>
+        </div>
+        <p class="term-note">打 tag 就会自动出包、算 SHA-256、发 Release —— 官网的安装包就是这么来的。</p>
+      </div>
+    </div>
+
+    <ul class="repo-points">
+      <li class="reveal">
+        <b>代码全公开</b>
+        <span>没有隐藏的二进制、没有偷偷的埋点。想确认它只连 <code>127.0.0.1</code>，翻代码比信口号快。</span>
+      </li>
+      <li class="reveal">
+        <b>MIT 许可</b>
+        <span>想改、想自用、想fork 成自己的版本都行；哪天不想要了，数据还是标准 <code>.kdbx</code>，KeePass 直接打开。</span>
+      </li>
+      <li class="reveal">
+        <b>提 issue 就说</b>
+        <span>碰见别扭的地方直接在仓库里提，改好了会写进更新日志 —— 这个页面本身就是照着日志改出来的。</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
 <!-- ============ 常见问题 ============ -->
-<section class="section section-alt" id="faq">
+<section class="section" id="faq">
   <div class="container">
     <div class="section-head reveal">
       <span class="kicker">FAQ</span>
@@ -640,14 +722,14 @@
 <footer class="footer">
   <div class="container footer-inner">
     <div class="footer-brand">
-      <span class="nav-logo">
+      <span class="nav-logo footer-logo">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 2.2l7.2 3.4v5.9c0 4.6-3.1 8.7-7.2 10.9-4.1-2.2-7.2-6.3-7.2-10.9V5.6L12 2.2z" fill="currentColor"/>
           <path d="M8.6 12.1l2.3 2.3 4.5-4.6" stroke="#0b1220" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
-      <div>
-        <b>钥匙窝</b>
+      <div class="footer-brand-txt">
+        <b>钥匙窝 <em>YaoShiWo</em></b>
         <i>本地密码管理器 · 数据只存在你自己电脑上</i>
       </div>
     </div>
@@ -656,9 +738,18 @@
       <a href="#security">安全</a>
       <a href="#extension">浏览器扩展</a>
       <a href="#changelog">更新日志</a>
+      <a href="#opensource">开源</a>
       <a href="#download">下载</a>
       <a href="https://github.com/liwg1/yaoshiwo" target="_blank" rel="noopener noreferrer">源码在 GitHub</a>
     </nav>
+    <div class="footer-meta">
+      <a class="footer-repo" href="https://github.com/liwg1/yaoshiwo" target="_blank" rel="noopener noreferrer" title="钥匙窝源码仓库">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span>liwg1/yaoshiwo</span>
+        <em>MIT</em>
+      </a>
+      <span class="footer-build">BUILD v1.3.0</span>
+    </div>
     <div class="footer-legal">
       <p class="footer-copy">© 2026 钥匙窝 YaoShiWo · 本地优先的密码管理方案</p>
       <p class="footer-icp">
@@ -685,6 +776,6 @@
   </div>
 </footer>
 
-<script src="assets/js/main.js"></script>
+<script src="assets/js/main.js?v=20261020b"></script>
 </body>
 </html>
