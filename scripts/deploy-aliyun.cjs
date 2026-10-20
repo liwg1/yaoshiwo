@@ -194,6 +194,11 @@ ${NGINX_COMMON}
     location / {
         try_files $uri $uri/ =404;
     }
+
+    error_page 404 /404.html;
+    location = /404.html {
+        internal;
+    }
 }
 `
   }
@@ -231,6 +236,11 @@ server {
 ${NGINX_COMMON}
     location / {
         try_files $uri $uri/ =404;
+    }
+
+    error_page 404 /404.html;
+    location = /404.html {
+        internal;
     }
 
     ssl_certificate     ${certDir}/fullchain.pem;
