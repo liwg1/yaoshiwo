@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 900px; height: 540px; overflow: hidden; }
+  body {
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: #0b1220; color: #e8eefc; padding: 44px 54px;
+    background-image: radial-gradient(circle at 12% 0%, rgba(99,102,241,.18), transparent 46%),
+                      radial-gradient(circle at 100% 100%, rgba(56,189,248,.16), transparent 46%);
+  }
+  .head { display: flex; align-items: baseline; gap: 14px; }
+  .head h2 { font-size: 30px; font-weight: 800; letter-spacing: -.5px; }
+  .head span { font-size: 13.5px; color: #7e93b3; }
+  .rule { margin: 16px 0 24px; height: 1px; background: linear-gradient(90deg, rgba(56,189,248,.45), rgba(99,102,241,.35), transparent); }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card {
+    padding: 18px 20px; border-radius: 14px;
+    border: 1px solid rgba(148,163,184,.16); background: rgba(148,163,184,.05);
+  }
+  .card .k { font-size: 12.5px; letter-spacing: 1.5px; color: #7dd3fc; }
+  .card h3 { margin-top: 8px; font-size: 17px; font-weight: 700; }
+  .card p { margin-top: 7px; font-size: 13px; line-height: 1.7; color: #a8bdd8; }
+  .ok { color: #34d399; font-weight: 700; }
+
+  .foot {
+    margin-top: 18px; display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(56,189,248,.28);
+    background: rgba(56,189,248,.08);
+  }
+  .foot span { font-size: 13.5px; color: #a8bdd8; }
+  .foot b { font-size: 15px; color: #7dd3fc; letter-spacing: .3px; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h2>软件之外的作业</h2>
+    <span>官网 · 证书 · 备案 · 开源</span>
+  </div>
+  <div class="rule"></div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="k">DOMAIN</div>
+      <h3>域名统一到 www</h3>
+      <p><span class="ok">✓</span> 根域名与 www 都指向同一站点，HTTP 一律 301 —— 同一份内容不留两个地址</p>
+    </div>
+    <div class="card">
+      <div class="k">HTTPS</div>
+      <h3>证书覆盖两个域名</h3>
+      <p><span class="ok">✓</span> Let's Encrypt 签发，到期自动续；续期演练已通过</p>
+    </div>
+    <div class="card">
+      <div class="k">ICP</div>
+      <h3>陕ICP备2026029660号</h3>
+      <p><span class="ok">✓</span> 首页底部居中展示，链接到工信部查询页</p>
+    </div>
+    <div class="card">
+      <div class="k">OPEN SOURCE</div>
+      <h3>源码以 MIT 开源</h3>
+      <p><span class="ok">✓</span> 打一个 tag 就自动出包、算 SHA256、发 Release</p>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>三处哈希一致：官网下载区 · GitHub Release · SHA256SUMS.txt</span>
+    <b>github.com/liwg1/yaoshiwo</b>
+  </div>
+</body>
+</html>

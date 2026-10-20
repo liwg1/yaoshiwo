@@ -47,3 +47,6 @@ chrome-extension.zip
 # ===== 自检脚本用的临时 Electron 数据目录 =====
 .site-check-userdata/
 .cover-userdata/
+
+# 图片渲染用的 Electron 用户数据
+.render-userdata/

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 900px; height: 383px; overflow: hidden; }
+  body {
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: #0b1220;
+    color: #e8eefc;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 56px;
+  }
+  .glow-a {
+    position: absolute; width: 620px; height: 620px; left: -180px; top: -300px;
+    background: radial-gradient(circle, rgba(56,189,248,.20), transparent 62%);
+  }
+  .glow-b {
+    position: absolute; width: 560px; height: 560px; right: -140px; bottom: -300px;
+    background: radial-gradient(circle, rgba(99,102,241,.22), transparent 62%);
+  }
+  .grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(148,163,184,.07) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(148,163,184,.07) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at 30% 40%, #000 30%, transparent 78%);
+  }
+  .left { position: relative; z-index: 2; max-width: 560px; }
+  .label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; letter-spacing: 2px; color: #7dd3fc;
+    border: 1px solid rgba(56,189,248,.35); background: rgba(56,189,248,.10);
+    border-radius: 999px; padding: 6px 14px;
+  }
+  .label i { width: 6px; height: 6px; border-radius: 50%; background: #38bdf8; display: block; }
+  h1 {
+    margin-top: 20px; font-size: 52px; line-height: 1.14; letter-spacing: -1px; font-weight: 800;
+    background: linear-gradient(96deg, #ffffff 8%, #7dd3fc 58%, #a5b4fc 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { margin-top: 16px; font-size: 19px; color: #a8bdd8; letter-spacing: .5px; }
+  .chips { margin-top: 26px; display: flex; gap: 10px; }
+  .chip {
+    font-size: 13.5px; color: #a8bdd8; padding: 7px 14px; border-radius: 9px;
+    border: 1px solid rgba(148,163,184,.22); background: rgba(148,163,184,.07);
+  }
+  .right { position: absolute; right: 66px; top: 50%; transform: translateY(-50%); z-index: 2; }
+  .ring {
+    width: 178px; height: 178px; border-radius: 50%;
+    border: 1px solid rgba(56,189,248,.30);
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 50% 42%, rgba(56,189,248,.16), transparent 70%);
+    box-shadow: 0 0 60px rgba(56,189,248,.16) inset;
+  }
+  .ring svg { width: 92px; height: 92px; }
+  .badge {
+    position: absolute; right: 0; bottom: 10px; font-size: 12.5px; color: #7dd3fc;
+    background: rgba(11,18,32,.85); border: 1px solid rgba(56,189,248,.3);
+    padding: 5px 11px; border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow-a"></div>
+  <div class="glow-b"></div>
+
+  <div class="left">
+    <div class="label"><i></i>更新记录 · 2026.10</div>
+    <h1>从 SafeVault<br />到钥匙窝</h1>
+    <div class="sub">更名之后，我们补齐的那些作业</div>
+    <div class="chips">
+      <span class="chip">v1.2.0 改名</span>
+      <span class="chip">扩展 v1.2.1</span>
+      <span class="chip">v1.3.0 四步教程</span>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="ring">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 2.2l7.2 3.4v5.9c0 4.6-3.1 8.7-7.2 10.9-4.1-2.2-7.2-6.3-7.2-10.9V5.6L12 2.2z" fill="#38bdf8" fill-opacity="0.16" stroke="#7dd3fc" stroke-width="1.1"/>
+        <path d="M8.6 12.1l2.3 2.3 4.5-4.6" stroke="#7dd3fc" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="badge">钥匙窝 YaoShiWo</span>
+  </div>
+</body>
+</html>

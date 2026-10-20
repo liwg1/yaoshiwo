@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 900px; height: 420px; overflow: hidden; }
+  body {
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: #0b1220; color: #e8eefc;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background-image: radial-gradient(circle at 50% 30%, rgba(56,189,248,.16), transparent 52%),
+                      radial-gradient(circle at 50% 100%, rgba(99,102,241,.18), transparent 48%);
+  }
+  .shield {
+    width: 66px; height: 66px; border-radius: 50%;
+    border: 1px solid rgba(56,189,248,.32); background: rgba(56,189,248,.10);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .shield svg { width: 34px; height: 34px; }
+  h2 {
+    margin-top: 18px; font-size: 34px; font-weight: 800; letter-spacing: -.5px;
+    background: linear-gradient(96deg, #ffffff 10%, #7dd3fc 62%, #a5b4fc 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { margin-top: 14px; font-size: 15.5px; color: #a8bdd8; letter-spacing: 1px; }
+  .urls { margin-top: 26px; display: flex; gap: 12px; }
+  .urls span {
+    font-size: 13.5px; color: #7dd3fc; padding: 7px 15px; border-radius: 999px;
+    border: 1px solid rgba(56,189,248,.28); background: rgba(56,189,248,.07);
+  }
+</style>
+</head>
+<body>
+  <div class="shield">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M12 2.2l7.2 3.4v5.9c0 4.6-3.1 8.7-7.2 10.9-4.1-2.2-7.2-6.3-7.2-10.9V5.6L12 2.2z" fill="#38bdf8" fill-opacity="0.16" stroke="#7dd3fc" stroke-width="1.2"/>
+      <path d="M8.6 12.1l2.3 2.3 4.5-4.6" stroke="#7dd3fc" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <h2>数据只存在你自己的电脑上</h2>
+  <div class="sub">本地加密 · 兼容 KeePass · 不上传云端</div>
+  <div class="urls">
+    <span>www.yaoshiwo.cn</span>
+    <span>github.com/liwg1/yaoshiwo</span>
+  </div>
+</body>
+</html>

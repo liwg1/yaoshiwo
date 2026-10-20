@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 900px; height: 640px; overflow: hidden; }
+  body {
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: #0b1220; color: #e8eefc; padding: 44px 54px;
+    background-image: radial-gradient(circle at 100% 0%, rgba(56,189,248,.18), transparent 44%),
+                      radial-gradient(circle at 0% 100%, rgba(99,102,241,.16), transparent 44%);
+  }
+  .head { display: flex; align-items: baseline; gap: 14px; }
+  .head h2 { font-size: 30px; font-weight: 800; letter-spacing: -.5px; }
+  .head span { font-size: 13.5px; color: #7e93b3; }
+  .rule { margin: 16px 0 24px; height: 1px; background: linear-gradient(90deg, rgba(56,189,248,.45), rgba(99,102,241,.35), transparent); }
+
+  .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .step {
+    position: relative; padding: 20px 20px 18px 22px; border-radius: 14px;
+    border: 1px solid rgba(148,163,184,.16); background: rgba(148,163,184,.05);
+  }
+  .step .n {
+    position: absolute; right: 16px; top: 12px; font-size: 40px; font-weight: 800;
+    color: rgba(125,211,252,.16); line-height: 1; letter-spacing: -2px;
+  }
+  .step h3 { font-size: 16.5px; font-weight: 700; margin-bottom: 8px; color: #e8eefc; }
+  .step p { font-size: 13px; line-height: 1.7; color: #a8bdd8; }
+  .step code {
+    font-family: Consolas, 'Microsoft YaHei', monospace; font-size: 12.5px;
+    color: #7dd3fc; background: rgba(56,189,248,.10); padding: 1px 6px; border-radius: 5px;
+  }
+  .note {
+    margin-top: 16px; padding: 14px 18px; border-radius: 12px;
+    border: 1px dashed rgba(148,163,184,.28); background: rgba(148,163,184,.04);
+    font-size: 13px; line-height: 1.85; color: #a8bdd8;
+  }
+  .note b { color: #fbbf24; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h2>浏览器扩展：四步装好</h2>
+    <span>v1.3.0 新增</span>
+  </div>
+  <div class="rule"></div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="n">01</div>
+      <h3>下载并解压</h3>
+      <p>设置面板里点「下载扩展包」，解压后的目录<b>不要删、不要挪</b>——浏览器是直接读那个文件夹的。</p>
+    </div>
+    <div class="step">
+      <div class="n">02</div>
+      <h3>打开开发者模式</h3>
+      <p>地址栏输入 <code>chrome://extensions</code>（Edge 用 <code>edge://extensions</code>），打开右上角的「开发者模式」。</p>
+    </div>
+    <div class="step">
+      <div class="n">03</div>
+      <h3>加载已解压的扩展程序</h3>
+      <p>点这个按钮，选中<b>含 manifest.json</b> 的那个文件夹，钥匙图标就会出现在扩展栏。</p>
+    </div>
+    <div class="step">
+      <div class="n">04</div>
+      <h3>粘贴访问令牌</h3>
+      <p>回到钥匙窝「设置 → 浏览器扩展」复制令牌，粘进扩展；端口保持默认即可配对。</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>填充不了？</b>按这个顺序查：① 钥匙窝是不是没解锁（锁定时拿不到凭证）② 扩展里的端口和设置页是否一致
+    ③ 是不是点过「重新生成令牌」——重新生成后必须重新粘贴。
+  </div>
+</body>
+</html>

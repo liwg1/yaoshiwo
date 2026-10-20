@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 900px; height: 620px; overflow: hidden; }
+  body {
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: #0b1220; color: #e8eefc; padding: 46px 54px;
+    background-image: radial-gradient(circle at 88% 0%, rgba(99,102,241,.20), transparent 46%),
+                      radial-gradient(circle at 0% 100%, rgba(56,189,248,.14), transparent 46%);
+  }
+  .head { display: flex; align-items: baseline; gap: 14px; }
+  .head h2 { font-size: 30px; font-weight: 800; letter-spacing: -.5px; }
+  .head span { font-size: 13.5px; color: #7e93b3; }
+  .rule { margin: 18px 0 26px; height: 1px; background: linear-gradient(90deg, rgba(56,189,248,.45), rgba(99,102,241,.35), transparent); }
+
+  .row { display: flex; gap: 20px; padding: 18px 20px; border-radius: 14px;
+         border: 1px solid rgba(148,163,184,.16); background: rgba(148,163,184,.05); }
+  .row + .row { margin-top: 14px; }
+  .ver { width: 132px; flex: none; }
+  .ver b { display: block; font-size: 20px; font-weight: 800; color: #7dd3fc; letter-spacing: .3px; }
+  .ver i { display: block; margin-top: 5px; font-style: normal; font-size: 12.5px; color: #7e93b3; letter-spacing: .5px; }
+  .body { flex: 1; }
+  .body h3 { font-size: 17px; font-weight: 700; margin-bottom: 9px; }
+  .body ul { list-style: none; display: flex; flex-wrap: wrap; gap: 7px 8px; }
+  .body li {
+    font-size: 13px; color: #a8bdd8; padding: 4px 10px; border-radius: 7px;
+    background: rgba(148,163,184,.10); border: 1px solid rgba(148,163,184,.14);
+  }
+  .tag-new { color: #34d399; }
+  .row.now { border-color: rgba(56,189,248,.42); background: rgba(56,189,248,.08); }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h2>更名之后的三个版本</h2>
+    <span>2026.10.14 → 10.20</span>
+  </div>
+  <div class="rule"></div>
+
+  <div class="row">
+    <div class="ver"><b>v1.2.0</b><i>10.14 改名</i></div>
+    <div class="body">
+      <h3>软件正式定名「钥匙窝 YaoShiWo」</h3>
+      <ul>
+        <li>关窗 ≠ 退出，收进状态栏</li>
+        <li>不再自动锁定</li>
+        <li>「最近使用」可以删</li>
+        <li>重复密码历史一键清理</li>
+        <li>官网开放扩展下载</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="ver"><b>扩展 1.2.1</b><i>10.16 只动扩展</i></div>
+    <div class="body">
+      <h3>下拉列表改成按账号选</h3>
+      <ul>
+        <li>主行加粗显示用户名</li>
+        <li>同网站不再重复地址</li>
+        <li>两个钥匙图标对齐</li>
+        <li>主程序不用重装</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row now">
+    <div class="ver"><b>v1.3.0</b><i>10.20 讲清楚</i></div>
+    <div class="body">
+      <h3>浏览器扩展怎么装，不用再问人 <span class="tag-new">NEW</span></h3>
+      <ul>
+        <li>设置面板四步清单</li>
+        <li>「下载扩展包」按钮</li>
+        <li>官网同步四步 + 排障</li>
+        <li>导航与页脚 GitHub 入口</li>
+        <li>源码以 MIT 开源</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
