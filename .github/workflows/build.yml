@@ -31,7 +31,14 @@ jobs:
         run: node node_modules/typescript/lib/tsc.js --noEmit
 
       - name: 打包（NSIS 安装版 + 免安装版）
-        run: npm run package:win
+        # --publish never：打 tag 触发时 electron-builder 会默认去「发布到 GitHub Release」，
+        # 没有 GH_TOKEN 就直接报 "GitHub Personal Access Token is not set" 失败。
+        # 安装包由这里作为工作流产物留存，Release 附件另行上传。
+        run: |
+          npm run build
+          npx electron-builder --win --x64 --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
 
       - name: 上传产物
         uses: actions/upload-artifact@v4
